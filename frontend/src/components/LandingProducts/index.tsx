@@ -5,27 +5,32 @@ import Card from "../Card";
 import { Product } from "@/types/Product";
  
 const MiniCard = styled.div`
-  max-width: 250px;
+ padding-top:10px
+
+`
+const Landing = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 `
 
 export interface LandingProductsProps {
   products: Array<Product>
 }
 
+
 const LandingProducts = ({ products } : LandingProductsProps) => {
 
   const productCards = products?.map( (product) => { return (
     <MiniCard key={product.title}>
-      <Card title={product.title}>
-        <p>{product.description}</p>
-        <p>{product.price}</p>
-      </Card>
+      <Card title={product.title} imgUrl={product.imageUrl} price={product.price}> </Card>
     </MiniCard>) });
 
   return (
-    <div>
+    <Landing>
       {productCards}
-    </div>
+    </Landing>
   );
 };
 

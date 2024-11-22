@@ -18,7 +18,8 @@ export const createProduct = async (product: Product): Promise<void> => {
   });
 };
 
-export const getProducts = async () : Promise<Product[]> => {
+export const getProducts = async (page: number, size: number): Promise<Product[]> => {
+  const offset = (page) * size;
   return new Promise((resolve, reject) => {
     db.all(`
       SELECT 
@@ -29,7 +30,8 @@ export const getProducts = async () : Promise<Product[]> => {
         p.category,
         p.image_url as imageUrl
       FROM product p
-    `, (err, rows) => {
+      LIMIT ? OFFSET ?
+    `, [size, offset], (err, rows) => {
       if (err) {
         reject(err);
       } else {

@@ -8,6 +8,14 @@ sqlite3 sqlite.db "VACUUM;"
 
 ### Migrations
 
+### Installation
+
+To use db-migrate you need to install it globally first:
+
+```shell
+npm install -g db-migrate
+```
+
 #### Running Migrations
 
 When first running the migrations, all will be executed in sequence. A table named migrations will also be created in your database to track which migrations have been applied.

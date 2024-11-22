@@ -1,37 +1,62 @@
 import { Product } from "../schemas/Product";
 
-const products: Array<Product> = 
-    [
-      {
-        id: 'df0c11a4-a7fc-4531-86a4-b0181ba5cdd6',
-        title: 'Product 1',
-        description: 'Description for product 1',
-        price: 29.99,
-        category: 'Category 1',
-        imageUrl: 'https://via.placeholder.com/150'
-      },
-      {
-        id: 'a5f14cdf-37e4-41d7-9e93-f42f346869f5',
-        title: 'Product 2',
-        description: 'Description for product 2',
-        price: 49.99,
-        category: 'Category 2',
-        imageUrl: 'https://via.placeholder.com/150'
-      },
-      {
-        id: 'e036a66f-5e2e-45de-a063-bc7a7150382f',
-        title: 'Product 3',
-        description: 'Description for product 3',
-        price: 19.99,
-        category: 'Category 3',
-        imageUrl: 'https://via.placeholder.com/150'
-      }
-    ];
+import db from "../database";
 
-export const getProducts = async () => {
-  return products;
+export const createProduct = async (product: Product): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const { id, title, description, price, category, imageUrl } = product;
+    db.run(`
+      INSERT INTO product (id, title, description, price, category, image_url)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [id, title, description, price, category, imageUrl], (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
+export const getProducts = async () : Promise<Product[]> => {
+  return new Promise((resolve, reject) => {
+    db.all(`
+      SELECT 
+        p.id,
+        p.title,
+        p.description,
+        p.price,
+        p.category,
+        p.image_url as imageUrl
+      FROM product p
+    `, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows as Product[]);
+      }
+    });
+  });
 }
 
-export const getProductById = async (id: string) => {
-  return products.find(product => product.id === id);
+export const getProductById = async (id: string): Promise<Product | null> => {
+  return new Promise((resolve, reject) => {
+    db.get(`
+      SELECT 
+        p.id,
+        p.title,
+        p.description,
+        p.price,
+        p.category,
+        p.image_url as imageUrl
+      FROM product p
+      WHERE p.id = ?
+    `, [id], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row ? (row as Product) : null);
+      }
+    });
+  });
 }

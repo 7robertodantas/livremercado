@@ -3,14 +3,19 @@
 import styled from "styled-components";
 import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
+import { useState } from 'react';
  
-const MiniCard = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+// const MiniCard = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// `;
 
 const CheckoutItemsDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: 700px;
   padding: 0px;
@@ -57,11 +62,10 @@ export interface CheckoutProps {
 const Checkout = ({ products } : CheckoutProps) => {
 
   const productCheckout = products?.map( (product) => { return (
-    <MiniCard key={product.index}>
-      <ItemCheckout image={product.product.imageUrl} product={product.product} quantity={product.quantity} />
-    </MiniCard>) });
+      <ItemCheckout key={product.index} image={product.product.imageUrl} product={product.product} quantity={product.quantity}/>
+  )});
 
-  const totalValue = products.reduce((item, {product}) => item + product.price, 0);
+  const totalValue = products.reduce((item, {product, quantity}) => item + (product.price*quantity), 0);
 
   return (
     <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>

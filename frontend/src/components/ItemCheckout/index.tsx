@@ -1,13 +1,14 @@
 'use client'
 
 //import { ChildrenProps } from "@/types";
+import { useState, useEffect } from "react";
 import { Product } from "@/types/Product";
 import styled from "styled-components";
 
 export interface ItemCheckoutProps {
     product: Product,
     image: string,
-    quantity: number
+    quantity: number,
 }
 
 const ItemCheckoutDiv = styled.div`
@@ -16,7 +17,7 @@ const ItemCheckoutDiv = styled.div`
     padding: 10px;
     border-bottom: 2px dotted #ddd;
     font-family: 'Arial';
-    gap: 32px;
+    gap: 48px;
 `;
 
 const DetailsDiv = styled.div`
@@ -39,14 +40,18 @@ const Price = styled.h6`
 `;
 
 const CountNumber = styled.div`
+    min-width: 40px;
+    height: 40px;
     color: black;
     font-size: 32px;
     font-weight: bold;
     text-align: center;
     width: 32px;
-    padding: 5px;
+    padding: 0 10px;
     border: solid 2px #007BFF;
     border-radius: 5px;
+    box-sizing: border-box;
+    margin: 10px;
 `;
 
 const Image = styled.img`
@@ -78,7 +83,24 @@ const Button = styled.button<{variant: "add" | "remove"}>`
     }
 `;
 
+
+
 const ItemCheckout = ({image, product, quantity} : ItemCheckoutProps) => {
+    const [productCount, setProductCount] = useState(quantity);
+
+    const handleAddProduct = () => {
+        const newCount = productCount+1;
+        setProductCount(newCount);
+        console.log(productCount);
+    }
+    const handleRemoveProduct = () => {
+        if(productCount > 0){
+            const newCount = productCount-1;
+            setProductCount(newCount);
+        }
+        console.log(productCount);
+    }
+
     return(
         <ItemCheckoutDiv>
             <Image src={image} alt="Product image"/>
@@ -86,12 +108,12 @@ const ItemCheckout = ({image, product, quantity} : ItemCheckoutProps) => {
                 <Description>{product.description}</Description>
                 <Price>R$ {product.price}</Price>
             </DetailsDiv>
-            <CountNumber>{quantity}</CountNumber>
+            <CountNumber>{productCount}</CountNumber>
             <ButtonDiv>
-                <Button variant="remove">
+                <Button variant="remove" onClick={handleRemoveProduct}>
                     -
                 </Button>
-                <Button variant="add">
+                <Button variant="add" onClick={handleAddProduct}>
                     +
                 </Button>
             </ButtonDiv>

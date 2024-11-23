@@ -1,7 +1,7 @@
 'use client'
 
 //import { ChildrenProps } from "@/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Product } from "@/types/Product";
 import styled from "styled-components";
 
@@ -9,6 +9,8 @@ export interface ItemCheckoutProps {
     product: Product,
     image: string,
     quantity: number,
+    onRemove: () => void,
+    onUpdateQuantity: (newQuantity: number) => void,
 }
 
 const ItemCheckoutDiv = styled.div`
@@ -85,20 +87,21 @@ const Button = styled.button<{variant: "add" | "remove"}>`
 
 
 
-const ItemCheckout = ({image, product, quantity} : ItemCheckoutProps) => {
+const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : ItemCheckoutProps) => {
     const [productCount, setProductCount] = useState(quantity);
-
+    useEffect(() => {
+        onUpdateQuantity(productCount)
+        if(productCount === 0) onRemove();
+    }, [productCount]);
     const handleAddProduct = () => {
         const newCount = productCount+1;
         setProductCount(newCount);
-        console.log(productCount);
     }
     const handleRemoveProduct = () => {
         if(productCount > 0){
             const newCount = productCount-1;
             setProductCount(newCount);
         }
-        console.log(productCount);
     }
 
     return(

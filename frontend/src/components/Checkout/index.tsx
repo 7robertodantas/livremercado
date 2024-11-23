@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
  
 // const MiniCard = styled.div`
 //   display: flex;
@@ -48,6 +48,13 @@ const Button = styled.button`
   }
 `;
 
+const EmptyCart = styled.span`
+  font-size: 24px;
+  color: black;
+  font-weight: regular;
+  text-align: center;
+`
+
 // const CheckoutDiv = styled.div`
 //   display: flex:
 //   flex-direction: column;
@@ -60,17 +67,41 @@ export interface CheckoutProps {
 }
 
 const Checkout = ({ products } : CheckoutProps) => {
+  const [productList, setProductList] = useState(products);
+  const [totalValue, setTotalValue] = useState(0);
 
-  const productCheckout = products?.map( (product) => { return (
-      <ItemCheckout key={product.index} image={product.product.imageUrl} product={product.product} quantity={product.quantity}/>
+  const handleUpdateQuantity = useCallback((index: number, newQuantity: number) => {
+    setProductList((prevList) =>
+      prevList.map((item) =>
+        item.index === index ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  }, []);
+
+  const handleRemoveItem = useCallback((index: number) => {
+    setProductList((prevList) => prevList.filter((item) => item.index !== index));
+  }, []);
+
+  useEffect(() => {
+    const newTotalValue = productList.reduce((total, { product, quantity }) => total + product.price * quantity,0);
+    setTotalValue(newTotalValue);
+  }, [productList]);
+
+  const productCheckout = productList?.map( (product) => { return (
+      <ItemCheckout key={product.index} 
+                    image={product.product.imageUrl}
+                    product={product.product} 
+                    quantity={product.quantity}
+                    onRemove={() => handleRemoveItem(product.index)}
+                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.index, newQuantity)}/>
   )});
 
-  const totalValue = products.reduce((item, {product, quantity}) => item + (product.price*quantity), 0);
+  //const totalValue = products.reduce((item, {product, quantity}) => item + (product.price*quantity), 0);
 
   return (
     <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
       <CheckoutItemsDiv>
-        {productCheckout}
+        {productCheckout.length > 0 ? (productCheckout) : (<EmptyCart>Carrinho está vazio</EmptyCart>)}
       </CheckoutItemsDiv>
       <Total>Valor Total: R$ {totalValue}</Total>
       <Button>Checkout</Button>

@@ -2,11 +2,13 @@
 
 import { ChildrenProps } from "@/types";
 import styled from "styled-components";
+import { useRouter } from "next/navigation";
 
 export interface CardProps {
   title: string;
   imgUrl: string;
   price:  number;
+  id: string;
 } 
 
 const CardDiv = styled.div`
@@ -68,10 +70,14 @@ const ProductImage = styled.img`
 `
 
 
-const Card = ({ title, imgUrl,price } : CardProps & ChildrenProps) => {
+const Card = ({ title, imgUrl,price,id } : CardProps & ChildrenProps) => {
+  const router = useRouter();
+  const handleClick = () => {
+  router.push("/product/"+ id); // Navega para a nova rota
+  };
   return (
     <CardDiv>
-      <CardContent>
+      <CardContent onClick={handleClick}>
       <ProductImage src={imgUrl} alt={title} />
       <Title>{title}</Title>
       <Price>R$ {price}</Price>

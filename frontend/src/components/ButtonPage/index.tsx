@@ -52,10 +52,6 @@ const ArrowButton: React.FC<ButtonProps> = ({ action}) => {
 
   const router = useRouter();
 
-  const goToUrl = () => {
-    
-  };
-
   const handleClick = () => {
     // Incrementa ou decrementa o valor na URL, dependendo da ação
     const newPage = action === 'next' ? currentId + 1 : currentId - 1;

@@ -73,7 +73,7 @@ const ProductImage = styled.img`
 const Card = ({ title, imgUrl,price,id } : CardProps & ChildrenProps) => {
   const router = useRouter();
   const handleClick = () => {
-  router.push("/product/"+ id); // Navega para a nova rota
+  router.push("/products/"+ id); // Navega para a nova rota
   };
   return (
     <CardDiv>

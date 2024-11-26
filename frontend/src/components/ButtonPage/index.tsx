@@ -40,51 +40,53 @@ const Title = styled.h1`
 `
 
 
+export interface PageProps {
+  page: number;
+}
+
+export interface ArrowButtonProps {
+  page: number;
+  icon: string;
+}
 
 
-const ArrowButton: React.FC<ButtonProps> = ({ action}) => {
-  const params = useParams();
-  // Garante que params.id seja uma string única ou use um valor padrão
-  const idAsString = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  // Converte para número com parseInt e define um fallback
-  const currentId = idAsString ? parseInt(idAsString, 10) : 1;
-
+const ArrowButton = ({ page, icon } : ArrowButtonProps) => {
   const router = useRouter();
-
   const handleClick = () => {
-    // Incrementa ou decrementa o valor na URL, dependendo da ação
-    const newPage = action === 'next' ? currentId + 1 : currentId - 1;
+    const params = new URLSearchParams({
+      'page': page ? page.toString() : '0',
+    });
 
-    // Adicionar lógica para atualizar a URL (se necessário)
+    const newPage = `/products?${params}`;
     console.log(`Navegando para a página: ${newPage}`);
-    const nextUrl = newPage != 0 ?  "/products/"+ newPage : "/"
-    router.push(nextUrl); // Navega para a nova rota
+    router.push(newPage); // Navega para a nova rota
   };
 
   return (
     <Button onClick={handleClick}>
-     <Title>{action === 'next' ? '>' : '<'}</Title>  {/* Muda o símbolo conforme a ação */}
+     <Title>{icon}</Title>  {/* Muda o símbolo conforme a ação */}
     </Button>
   );
 };
 
-const NextPage = () => { 
-  const currentPage = 1; 
+const NextPage = ({ page }: PageProps) => { 
   return (
     <div>
-      <ArrowButton action="next" />
+      <ArrowButton page={page+1} icon=">" />
     </div>
   );
 };
 
-const PrevPage = () => { 
-  const currentPage = 1; 
-  return (
-    <div>
-      <ArrowButton action="prev" /> 
-    </div>
-  );
+const PrevPage = ({ page }: PageProps) => { 
+  if (page > 0) {
+    return (
+      <div>
+        <ArrowButton page={page-1} icon="<" /> 
+      </div>
+    );
+  }
+  return <></>
 }; 
 
 // Exporta os dois componentes

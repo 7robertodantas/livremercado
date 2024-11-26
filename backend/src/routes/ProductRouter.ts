@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { getProductById, getProducts } from '../repositories/ProductRepository';
 import { createProduct } from '../repositories/ProductRepository';
+import { Page } from '../schemas/Page';
+import { Product } from '../schemas/Product';
 
 const router = Router();
 
@@ -8,10 +10,10 @@ const router = Router();
  * Retrieve all products
  */
 router.get('/', async (req, res) => {
-    const page = req.query.page ? parseInt(req.query.page as string, 10) : 0;
-    const size = req.query.size ? parseInt(req.query.size as string, 10) : 10;
-    const products = await getProducts(page, size);
-    res.status(200).send(products);
+    const page : number = req.query.page ? parseInt(req.query.page as string, 10) : 0;
+    const size : number = req.query.size ? parseInt(req.query.size as string, 10) : 10;
+    const productsPage : Page<Product> = await getProducts(page, size);
+    res.status(200).send(productsPage);
 });
 
 /**

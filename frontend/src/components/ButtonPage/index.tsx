@@ -39,55 +39,21 @@ const Title = styled.h1`
   text-align: center;
 `
 
-
-export interface PageProps {
-  page: number;
-}
-
 export interface ArrowButtonProps {
-  page: number;
+  url: string;
   icon: string;
 }
 
-
-
-const ArrowButton = ({ page, icon } : ArrowButtonProps) => {
+export const ArrowButton = ({ url, icon } : ArrowButtonProps) => {
   const router = useRouter();
   const handleClick = () => {
-    const params = new URLSearchParams({
-      'page': page ? page.toString() : '0',
-    });
-
-    const newPage = `/products?${params}`;
-    console.log(`Navegando para a página: ${newPage}`);
-    router.push(newPage); // Navega para a nova rota
+    console.log(`Navegando para a página: ${url}`);
+    router.push(url);
   };
 
   return (
     <Button onClick={handleClick}>
-     <Title>{icon}</Title>  {/* Muda o símbolo conforme a ação */}
+     <Title>{icon}</Title>
     </Button>
   );
 };
-
-const NextPage = ({ page }: PageProps) => { 
-  return (
-    <div>
-      <ArrowButton page={page+1} icon=">" />
-    </div>
-  );
-};
-
-const PrevPage = ({ page }: PageProps) => { 
-  if (page > 0) {
-    return (
-      <div>
-        <ArrowButton page={page-1} icon="<" /> 
-      </div>
-    );
-  }
-  return <></>
-}; 
-
-// Exporta os dois componentes
-export { NextPage, PrevPage };

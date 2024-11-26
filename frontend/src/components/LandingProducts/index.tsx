@@ -1,14 +1,11 @@
 'use client';
 
 import styled from "styled-components";
-import Card from "../Card";
 import { Product } from "@/types/Product";
-import Link from "next/link";
+import { Page } from "@/types/Page";
+import ProductCard from "../ProductCard";
  
-const MiniCard = styled.div`
- padding-top:10px
 
-`
 const Landing = styled.div`
   display: flex;
   align-items: center;
@@ -17,16 +14,11 @@ const Landing = styled.div`
 `
 
 export interface LandingProductsProps {
-  products: Array<Product>
+  productsPage: Page<Product>
 }
 
-
-const LandingProducts = ({ products } : LandingProductsProps) => {
-
-  const productCards = products?.map( (product) => { return (
-    <MiniCard key={product.title}>
-      <Card title={product.title} imgUrl={product.imageUrl} price={product.price} id={product.id}> </Card>
-    </MiniCard>) });
+const LandingProducts = ({ productsPage } : LandingProductsProps) => {
+  const productCards = productsPage.items?.map( (product) => { return (<ProductCard product={product} />) });
 
   return (
     <Landing>

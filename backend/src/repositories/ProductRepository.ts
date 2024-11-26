@@ -1,6 +1,7 @@
 import { Product } from "../schemas/Product";
 
 import db from "../database";
+import { Page, PageFactory } from "../schemas/Page";
 
 export const createProduct = async (product: Product): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -18,24 +19,32 @@ export const createProduct = async (product: Product): Promise<void> => {
   });
 };
 
-export const getProducts = async (page: number, size: number): Promise<Product[]> => {
+export const getProducts = async (page: number, size: number): Promise<Page<Product>> => {
   const offset = (page) * size;
   return new Promise((resolve, reject) => {
-    db.all(`
-      SELECT 
-        p.id,
-        p.title,
-        p.description,
-        p.price,
-        p.category,
-        p.image_url as imageUrl
-      FROM product p
-      LIMIT ? OFFSET ?
-    `, [size, offset], (err, rows) => {
+    db.get(`SELECT COUNT(*) as count FROM product`, [], (err, result : { count: number }) => {
       if (err) {
         reject(err);
       } else {
-        resolve(rows as Product[]);
+        const totalElements = result.count;
+    
+        db.all(`
+          SELECT 
+            p.id,
+            p.title,
+            p.description,
+            p.price,
+            p.category,
+            p.image_url as imageUrl
+          FROM product p
+          LIMIT ? OFFSET ?
+        `, [size, offset], (err, rows) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(PageFactory.of<Product>(page, size, rows as Product[], totalElements));
+          }
+        });
       }
     });
   });

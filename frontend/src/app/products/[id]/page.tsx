@@ -1,13 +1,12 @@
 'use client';
 
-import LandingProducts from '@/components/LandingProducts';
-import { NextPage, PrevPage } from '@/components/ButtonPage';
 import MainLayout from '@/layouts/MainLayout';
 import { Product } from '@/types/Product';
 import { getProductById, listProducts } from '@/services/products';
 import { useEffect, useState } from 'react';
 import styled from "styled-components";
 import { useParams } from 'next/navigation';
+import ProductCard from '@/components/ProductCard';
 
 
 const LandingPage = styled.div`
@@ -29,7 +28,7 @@ export default function Home() {
 
   return (
     <MainLayout>
-      {product && <LandingProducts products={[product]}></LandingProducts>}
+      {product && <ProductCard product={product} />}
     </MainLayout>
   );
 }

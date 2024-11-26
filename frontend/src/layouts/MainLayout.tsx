@@ -5,6 +5,7 @@ import Footer, { FooterProps } from '@/components/Footer';
 import Header, { HeaderProps } from '@/components/Header';
 import Main from '@/components/Main'
 import styled from 'styled-components';
+import { ChildrenProps } from '@/types';
 
 const Page = styled.div`
   display: flex;
@@ -12,13 +13,23 @@ const Page = styled.div`
   height: 100vh;  
 `
 
-export interface MainLayoutProps {
-  children: ReactNode;
-  header: HeaderProps;
-  footer: FooterProps;
-}
+const header: HeaderProps = {
+  title: 'Livre Mercado',
+  links: [{
+    title: 'Home',
+    href: '/'
+  },
+  {
+    title: 'Buscar',
+    href: '/search'
+  }]
+};
 
-export default function MainLayout({ children, header, footer }: MainLayoutProps) {
+const footer: FooterProps = {
+  text: 'Copyright © 1999-2024 livre mercado.'
+};
+
+export default function MainLayout({ children }: ChildrenProps) {
   return (
     <Page>
       <Header {...header}></Header>

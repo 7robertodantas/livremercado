@@ -27,17 +27,17 @@ Content-Type: application/json
 
 
 ### Get all sellers
-GET http://localhost:4000/saller HTTP/1.1
+GET http://localhost:4000/seller HTTP/1.1
 
 
 ### Get all sellers (com paginação)
-GET http://localhost:4000/saller?page=0&size=10 HTTP/1.1
+GET http://localhost:4000/seller?page=0&size=10 HTTP/1.1
 
 ### Get a single seller by ID
-GET http://localhost:4000/saller/seller1 HTTP/1.1
+GET http://localhost:4000/seller/seller1 HTTP/1.1
 
 ### Create a new seller
-POST http://localhost:4000/saller HTTP/1.1
+POST http://localhost:4000/seller HTTP/1.1
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ Content-Type: application/json
 }
 
 ### Update a seller's information
-PATCH http://localhost:4000/saller/saler1 HTTP/1.1
+PATCH http://localhost:4000/seller/saler1 HTTP/1.1
 Content-Type: application/json
 
 {
@@ -61,4 +61,4 @@ Content-Type: application/json
 }
 
 ### Delete a seller
-DELETE http://localhost:4000/saller/123 HTTP/1.1
+DELETE http://localhost:4000/seller/123 HTTP/1.1

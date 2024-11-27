@@ -1,5 +1,5 @@
 import db from "../database";
-import { Seller } from "../schemas/Saller";
+import { Seller } from "../schemas/Seller";
 
 export const createSeller = async (seller: Seller): Promise<void> => {
   return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createSeller, getSellerById, getSellersPages, updateSeller, deleteSeller, getSellers } from '../repositories/SallerRepository';
+import { createSeller, getSellerById, getSellersPages, updateSeller, deleteSeller, getSellers } from '../repositories/SellerRepository';
 
 const router = Router();
 

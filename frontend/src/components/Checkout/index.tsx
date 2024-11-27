@@ -57,16 +57,16 @@ const Checkout = ({ products } : CheckoutProps) => {
   const [productList, setProductList] = useState(products);
   const [totalValue, setTotalValue] = useState(0);
 
-  const handleUpdateQuantity = useCallback((index: number, newQuantity: number) => {
+  const handleUpdateQuantity = useCallback((id: number, newQuantity: number) => {
     setProductList((prevList) =>
       prevList.map((item) =>
-        item.index === index ? { ...item, quantity: newQuantity } : item
+        item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
   }, []);
 
-  const handleRemoveItem = useCallback((index: number) => {
-    setProductList((prevList) => prevList.filter((item) => item.index !== index));
+  const handleRemoveItem = useCallback((id: number) => {
+    setProductList((prevList) => prevList.filter((item) => item.id !== id));
   }, []);
 
   useEffect(() => {
@@ -75,12 +75,12 @@ const Checkout = ({ products } : CheckoutProps) => {
   }, [productList]);
 
   const productCheckout = productList?.map( (product) => { return (
-      <ItemCheckout key={product.index} 
+      <ItemCheckout key={product.id} 
                     image={product.product.imageUrl}
                     product={product.product} 
                     quantity={product.quantity}
-                    onRemove={() => handleRemoveItem(product.index)}
-                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.index, newQuantity)}/>
+                    onRemove={() => handleRemoveItem(product.id)}
+                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.id, newQuantity)}/>
   )});
 
   return (

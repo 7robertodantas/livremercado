@@ -1,34 +1,105 @@
 import { Cart } from "../schemas/Cart";
 
-const cart: Cart = {
-  items: [
-    {
-      index: 1,
-      product: {
-        id: 'df0c11a4-a7fc-4531-86a4-b0181ba5cdd6',
-        title: 'Product 1',
-        description: 'Description for product 1',
-        price: 29.99,
-        category: 'Category 1',
-        imageUrl: 'https://via.placeholder.com/150'
-      },
-      quantity: 2
-    },
-    {
-      index: 2,
-      product: {
-        id: 'a5f14cdf-37e4-41d7-9e93-f42f346869f5',
-        title: 'Product 2',
-        description: 'Description for product 2',
-        price: 49.99,
-        category: 'Category 2',
-        imageUrl: 'https://via.placeholder.com/150'
-      },
-      quantity: 1
-    }
-  ]
-}
+import db from "../database";
+
+interface CartItemQuery {
+  cartItemId: number;
+  productId: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  imageUrl: string;
+  quantity: number;
+};
+
+const getCartItems = async (): Promise<CartItemQuery[]> => {
+  return new Promise((resolve, reject) => {
+    db.all(`
+      SELECT 
+        c.id as cartItemId, 
+        p.id as productId, 
+        p.title, 
+        p.description, 
+        p.price, 
+        p.category, 
+        p.image_url as imageUrl, 
+        c.quantity 
+      FROM cart_item c 
+      LEFT JOIN product p ON c.product_id = p.id
+    `, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows as CartItemQuery[]);
+      }
+    });
+  });
+};
+
+export const addProductToCart = async (productId: string, quantity: number) => {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      INSERT INTO cart_item (product_id, quantity) 
+      VALUES (?, ?)
+    `, [productId, quantity], function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ id: this.lastID });
+      }
+    });
+  });
+};
 
 export const getCart = async () => {
+  const cartItems = await getCartItems();
+
+  const cart: Cart = {
+    items: cartItems.map((item: CartItemQuery) => ({
+      id: item.cartItemId,
+      product: {
+        id: item.productId,
+        title: item.title,
+        description: item.description,
+        price: item.price,
+        category: item.category,
+        imageUrl: item.imageUrl
+      },
+      quantity: item.quantity
+    }))
+  };
+
   return cart;
-}
+};
+
+export const updateProductInCart = async (productId: string, quantity: number) => {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      UPDATE cart_item 
+      SET quantity = ? 
+      WHERE product_id = ?
+    `, [quantity, productId], function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+};
+
+export const removeProductFromCart = async (productId: string) => {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      DELETE FROM cart_item 
+      WHERE product_id = ?
+    `, [productId], function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+};

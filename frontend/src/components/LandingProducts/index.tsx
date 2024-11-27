@@ -1,14 +1,20 @@
 'use client';
 
 import styled from "styled-components";
-import Card from "../Card";
 import { Product } from "@/types/Product";
-import Link from "next/link";
+import { Page, PageFactory } from "@/types/Page";
+import ProductCard from "../ProductCard";
+import NavButton from "./NavButton";
+import { useEffect, useState } from "react";
+import { listProducts } from "@/services/products";
  
-const MiniCard = styled.div`
- padding-top:10px
-
+const LandingPage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 `
+
 const Landing = styled.div`
   display: flex;
   align-items: center;
@@ -17,21 +23,37 @@ const Landing = styled.div`
 `
 
 export interface LandingProductsProps {
-  products: Array<Product>
+  page: number;
+  size: number;
 }
 
+const getProductsUrl = (page: number) => {
+  const params = new URLSearchParams({
+    'page': page.toString(),
+  });
+  return `/products?${params}`;
+};
 
-const LandingProducts = ({ products } : LandingProductsProps) => {
+const LandingProducts = ({ page, size } : LandingProductsProps) => {
+  const [productsPage, setProductsPage] = useState<Page<Product>>(PageFactory.emptyPage<Product>());
 
-  const productCards = products?.map( (product) => { return (
-    <MiniCard key={product.title}>
-      <Card title={product.title} imgUrl={product.imageUrl} price={product.price} id={product.id}> </Card>
-    </MiniCard>) });
+  useEffect(() => {
+    listProducts({page , size}).then(setProductsPage);
+  }, [page, size]);
+
+
+  const productCards = productsPage.items?.map( (product) => { return (<ProductCard key={product.id} product={product} />) });
 
   return (
-    <Landing>
-      {productCards}
-    </Landing>
+    <LandingPage>
+      {productsPage.hasPreviousPage && <NavButton icon='<' url={getProductsUrl(productsPage.previousPage)} />}
+      <Landing>
+        {productCards}
+      </Landing>
+      {productsPage.hasNextPage && <NavButton icon='>' url={getProductsUrl(productsPage.nextPage)} />}
+    </LandingPage>
+
+    
   );
 };
 

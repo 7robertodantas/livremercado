@@ -4,13 +4,6 @@ import { ChildrenProps } from "@/types";
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
 
-export interface CardProps {
-  title: string;
-  imgUrl: string;
-  price:  number;
-  id: string;
-} 
-
 const CardDiv = styled.div`
   background-color: #fff;
   color: #e9e9e9;
@@ -69,11 +62,17 @@ const ProductImage = styled.img`
   object-fit: scale-down;
 `
 
+export interface CardProps {
+  title: string;
+  imgUrl: string;
+  price:  number;
+  id: string;
+} 
 
 const Card = ({ title, imgUrl,price,id } : CardProps & ChildrenProps) => {
   const router = useRouter();
   const handleClick = () => {
-  router.push("/products/"+ id); // Navega para a nova rota
+    router.push("/products/" + id); // Navega para a nova rota
   };
   return (
     <CardDiv>

@@ -1,5 +1,6 @@
 'use server'
 
+import { Page } from "@/types/Page";
 import { Product } from "@/types/Product";
 import { CartItem } from "@/types/CartItem";
 
@@ -14,7 +15,7 @@ export async function getProductById({ id }: { id: string }): Promise<Product> {
   return result;
 }
 
-export async function listProducts({ page, size }: { page: number, size: number }): Promise<Product[]> {
+export async function listProducts({ page, size }: { page: number, size: number }): Promise<Page<Product>> {
   const params = new URLSearchParams({
     'page': page ? page.toString() : '0',
     'size': size ? size.toString() : '10'

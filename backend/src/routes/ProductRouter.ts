@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { getProductById, getProducts } from '../repositories/ProductRepository';
-import { createProduct } from '../repositories/ProductRepository';
+import { getProductById, getProducts, createProduct, updateProductFavorite } from '../repositories/ProductRepository';
 
 const router = Router();
 
@@ -44,6 +43,32 @@ router.get('/:id', async (req, res) => {
         return;
     }
     res.status(200).send(product);
+});
+
+/**
+ * Update isFavorite status for a product
+ */
+router.patch('/:id/favorite', async (req, res) => {
+    try {
+        const { isFavorite } = req.body;
+
+        if (typeof isFavorite !== 'boolean') {
+            res.status(400).send({ message: '`isFavorite` must be a boolean value' });
+            return;
+        }
+
+        const product = await getProductById(req.params.id);
+        if (product == null) {
+            res.status(404).send({ message: 'Product not found' });
+            return;
+        }
+
+        await updateProductFavorite(req.params.id, isFavorite);
+        res.status(200).send({ message: 'Product favorite status updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Internal Server Error' });
+    }
 });
 
 export default router;

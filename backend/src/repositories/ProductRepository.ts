@@ -4,11 +4,11 @@ import db from "../database";
 
 export const createProduct = async (product: Product): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const { id, title, description, price, category, imageUrl } = product;
+    const { id, title, description, price, category, imageUrl, sellerId } = product;
     db.run(`
-      INSERT INTO product (id, title, description, price, category, image_url)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [id, title, description, price, category, imageUrl], (err) => {
+      INSERT INTO product (id, title, description, price, category, image_url, seller_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [id, title, description, price, category, imageUrl, sellerId], (err) => {
       if (err) {
         reject(err);
       } else {
@@ -28,7 +28,9 @@ export const getProducts = async (page: number, size: number): Promise<Product[]
         p.description,
         p.price,
         p.category,
-        p.image_url as imageUrl
+        p.image_url as imageUrl,
+        p.is_favorite as isFavorite,
+        p.seller_id as sellerId
       FROM product p
       LIMIT ? OFFSET ?
     `, [size, offset], (err, rows) => {
@@ -50,7 +52,9 @@ export const getProductById = async (id: string): Promise<Product | null> => {
         p.description,
         p.price,
         p.category,
-        p.image_url as imageUrl
+        p.image_url as imageUrl,
+        p.is_favorite as isFavorite,
+        p.seller_id as sellerId
       FROM product p
       WHERE p.id = ?
     `, [id], (err, row) => {
@@ -61,4 +65,20 @@ export const getProductById = async (id: string): Promise<Product | null> => {
       }
     });
   });
-}
+};
+
+export const updateProductFavorite = async (id: string, isFavorite: boolean): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      UPDATE product
+      SET is_favorite = ?
+      WHERE id = ?
+    `, [isFavorite, id], (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};

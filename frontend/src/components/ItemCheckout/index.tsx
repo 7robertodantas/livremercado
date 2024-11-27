@@ -88,7 +88,7 @@ export interface ItemCheckoutProps {
 const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : ItemCheckoutProps) => {
     const [productCount, setProductCount] = useState(quantity);
 
-    const handleMinnus = async () => {
+    const handleMinus = async () => {
         const newCount = productCount - 1;
         setProductCount(newCount);
         if (newCount <= 0) await onRemove();
@@ -110,7 +110,7 @@ const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : I
             </DetailsDiv>
             <CountNumber>{productCount}</CountNumber>
             <ButtonDiv>
-                <Button variant="remove" onClick={handleMinnus}>
+                <Button variant="remove" onClick={handleMinus}>
                     -
                 </Button>
                 <Button variant="add" onClick={handlePlus}>

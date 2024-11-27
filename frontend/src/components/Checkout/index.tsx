@@ -4,12 +4,6 @@ import styled from "styled-components";
 import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
 import { useState, useCallback, useEffect } from 'react';
- 
-// const MiniCard = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// `;
 
 const CheckoutItemsDiv = styled.div`
   display: flex;

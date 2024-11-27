@@ -20,8 +20,8 @@ const header: HeaderProps = {
     href: '/'
   },
   {
-    title: 'Buscar',
-    href: '/search'
+    title: 'Carrinho',
+    href: '/checkout'
   }]
 };
 

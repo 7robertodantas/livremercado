@@ -91,15 +91,17 @@ const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : I
     const handleMinus = async () => {
         const newCount = productCount - 1;
         setProductCount(newCount);
-        if (newCount <= 0) await onRemove();
-        else await onUpdateQuantity(newCount);
     }
 
     const handlePlus = async () => {
         const newCount = productCount + 1;
         setProductCount(newCount);
-        await onUpdateQuantity(newCount);
     }
+
+    useEffect(() => {
+        if (productCount <= 0) onRemove();
+        else onUpdateQuantity(productCount);
+    }, [productCount]);
 
     return(
         <ItemCheckoutDiv>

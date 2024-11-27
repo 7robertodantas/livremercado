@@ -54,8 +54,6 @@ const footer: FooterProps = {
   text: 'Copyright © 1999-2024 livre mercado.'
 };
 
-
-
 export default function Home() {
   return (
     <MainLayout header={header} footer={footer}>

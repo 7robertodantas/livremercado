@@ -55,13 +55,6 @@ const EmptyCart = styled.span`
   text-align: center;
 `
 
-// const CheckoutDiv = styled.div`
-//   display: flex:
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-// `;
-
 export interface CheckoutProps {
   products: Array<CartItem>
 }
@@ -95,8 +88,6 @@ const Checkout = ({ products } : CheckoutProps) => {
                     onRemove={() => handleRemoveItem(product.index)}
                     onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.index, newQuantity)}/>
   )});
-
-  //const totalValue = products.reduce((item, {product, quantity}) => item + (product.price*quantity), 0);
 
   return (
     <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>

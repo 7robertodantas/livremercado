@@ -1,6 +1,5 @@
 'use client'
 
-//import { ChildrenProps } from "@/types";
 import { useState, useEffect, useCallback } from "react";
 import { Product } from "@/types/Product";
 import styled from "styled-components";

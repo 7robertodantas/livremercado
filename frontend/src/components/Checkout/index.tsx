@@ -3,7 +3,8 @@
 import styled from "styled-components";
 import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { deleteCartItem, listCartItems, updateCartItem } from "@/services/checkout";
 
 const CheckoutItemsDiv = styled.div`
   display: flex;
@@ -49,42 +50,51 @@ const EmptyCart = styled.span`
   text-align: center;
 `
 
-export interface CheckoutProps {
-  products: Array<CartItem>
-}
+const Checkout = () => {
+  const [productList, setProductList] = useState<CartItem[]>([]);
+  const [totalValue, setTotalValue] = useState<number>(0);
 
-const Checkout = ({ products } : CheckoutProps) => {
-  const [productList, setProductList] = useState(products);
-  const [totalValue, setTotalValue] = useState(0);
+  const loadTotalValue = () => {
+    const newTotalValue = productList.reduce((total, { product, quantity }) => total + product.price * quantity, 0);
+    setTotalValue(newTotalValue);
+  };
 
-  const handleUpdateQuantity = useCallback((id: number, newQuantity: number) => {
-    setProductList((prevList) =>
-      prevList.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  }, []);
+  const loadCart = async () => {
+    const page = await listCartItems();
+    setProductList(page.items);
+  };
 
-  const handleRemoveItem = useCallback((id: number) => {
-    setProductList((prevList) => prevList.filter((item) => item.id !== id));
+  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
+    await updateCartItem(id, newQuantity);
+    loadCart();
+  };
+
+  const handleRemoveItem = async (id: string) => {
+    await deleteCartItem(id);
+    loadCart();
+  };
+  
+  useEffect(() => {
+    loadCart();
   }, []);
 
   useEffect(() => {
-    const newTotalValue = productList.reduce((total, { product, quantity }) => total + product.price * quantity,0);
-    setTotalValue(newTotalValue);
+    loadTotalValue();
   }, [productList]);
 
-  const productCheckout = productList?.map( (product) => { return (
-      <ItemCheckout key={product.id} 
+  const productCheckout = productList?.map((product) => {
+    return (
+      <ItemCheckout key={product.id}
                     image={product.product.imageUrl}
-                    product={product.product} 
+                    product={product.product}
                     quantity={product.quantity}
-                    onRemove={() => handleRemoveItem(product.id)}
-                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.id, newQuantity)}/>
-  )});
+                    onRemove={() => handleRemoveItem(product.product.id)}
+                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.product.id, newQuantity)} />
+    );
+  });
 
   return (
-    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
       <CheckoutItemsDiv>
         {productCheckout.length > 0 ? (productCheckout) : (<EmptyCart>Carrinho está vazio</EmptyCart>)}
       </CheckoutItemsDiv>

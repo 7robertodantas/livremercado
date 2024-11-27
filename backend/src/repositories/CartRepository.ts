@@ -1,6 +1,6 @@
-import { Cart } from "../schemas/Cart";
-
 import db from "../database";
+import { CartItem } from "../schemas/CartItem";
+import { Page, PageFactory } from "../schemas/Page";
 
 interface CartItemQuery {
   cartItemId: number;
@@ -57,27 +57,24 @@ export const addProductToCart = async (productId: string, quantity: number) => {
   });
 };
 
-export const getCart = async () => {
+export const getCart = async () : Promise<Page<CartItem>> => {
   const cartItems = await getCartItems();
-
-  const cart: Cart = {
-    items: cartItems.map((item: CartItemQuery) => ({
-      id: item.cartItemId,
-      product: {
-        id: item.productId,
-        title: item.title,
-        description: item.description,
-        price: item.price,
-        category: item.category,
-        imageUrl: item.imageUrl,
-        isFavorite: item.isFavorite,
-        sellerId: item.sellerId,
-      },
-      quantity: item.quantity
-    }))
-  };
-
-  return cart;
+  const items = cartItems.map((item: CartItemQuery) => ({
+    id: item.cartItemId,
+    product: {
+      id: item.productId,
+      title: item.title,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      imageUrl: item.imageUrl,
+      isFavorite: item.isFavorite,
+      sellerId: item.sellerId,
+    },
+    quantity: item.quantity
+  }));
+  
+  return PageFactory.of(0, items.length, items as CartItem[], items.length);
 };
 
 export const updateProductInCart = async (productId: string, quantity: number) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import styled from "styled-components";
+import { useRouter } from "next/navigation";
 
 const NavHeader = styled.header`
   background-color: var(--c4);
@@ -127,6 +128,27 @@ const SearchBtn = styled.button`
   }
 `
 
+const CartButton = styled.button`
+  background: var(--c6);
+  color: var(--c1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 48px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  height: 50%;
+
+  span {
+    margin-left: 8px;
+    font-family: 'Material Icons';
+    font-size: 24px;
+    color: var(--c1);
+  }
+`;
+
 export interface HeaderLink {
   title: string;
   href: string;
@@ -135,30 +157,29 @@ export interface HeaderLink {
 export interface HeaderProps {
   title: string;
   subtitle: string;
-  links: Array<HeaderLink>
 }
 
 const header: HeaderProps = {
   title: 'Livre Mercado',
-  subtitle: 'O lugar onde tudo se encontra!',
-  links: [{
-    title: 'Home',
-    href: '/'
-  },
-  {
-    title: 'Carrinho',
-    href: '/checkout'
-  }]
+  subtitle: 'O lugar onde tudo se encontra!'
 };
 
 
 const Header = () => {
-  const linksList = header.links?.map( (link) => <a key={link.title} href={link.href}>{link.title}</a>)
+  const router = useRouter();
+
+  const handleCartButtonClick = () => {
+    router.push('/checkout');
+  };
+
+  const handleLogoClick = () => {
+    router.push('/');
+  };
 
   return (
     <NavHeader>
       <NavBounds>
-        <LogoDiv>
+        <LogoDiv onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
           <Title>{header.title}</Title>
           <Subtitle>{header.subtitle}</Subtitle>
         </LogoDiv>  
@@ -171,7 +192,10 @@ const Header = () => {
           </SearchForm>
         </MiddleDiv>
         <NavLinks>
-          {linksList}
+          <CartButton onClick={handleCartButtonClick}>
+            Carrinho
+            <span className="material-symbols-outlined">shopping_cart</span>
+          </CartButton>
         </NavLinks>
       </NavBounds>
     </NavHeader>

@@ -8,10 +8,11 @@ export default function PageComponent() {
   const searchParams = useSearchParams();
   const page = parseInt(searchParams.get('page') || '0', 10);
   const size = parseInt(searchParams.get('size') || '5', 10);
+  const search = searchParams.get('search') || '';
 
   return (
     <MainLayout>
-      <LandingProducts page={page} size={size} />
+      <LandingProducts page={page} size={size} search={search} />
     </MainLayout>
   );
 }

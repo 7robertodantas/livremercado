@@ -2,6 +2,7 @@
 
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
+import { useState } from 'react';
 
 const NavHeader = styled.header`
   background-color: var(--c4);
@@ -167,6 +168,7 @@ const header: HeaderProps = {
 
 const Header = () => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleCartButtonClick = () => {
     router.push('/checkout');
@@ -174,6 +176,22 @@ const Header = () => {
 
   const handleLogoClick = () => {
     router.push('/');
+  };
+
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (searchQuery) {
+      const params = new URLSearchParams({
+        'search': searchQuery
+      });
+      router.replace(`/products?${params}`);
+    } else {
+      router.push('/');
+    }
   };
 
   return (
@@ -184,9 +202,13 @@ const Header = () => {
           <Subtitle>{header.subtitle}</Subtitle>
         </LogoDiv>  
         <MiddleDiv>
-          <SearchForm>
-            <SearchInput placeholder="Buscar produtos, marcas e muito mais..." />
-            <SearchBtn>
+          <SearchForm onSubmit={handleSearchSubmit}>
+            <SearchInput 
+              value={searchQuery} 
+              onChange={handleSearchInputChange} 
+              placeholder="Buscar produtos, marcas e muito mais..." 
+            />
+            <SearchBtn type="submit">
               <span className="material-symbols-outlined">search</span>
             </SearchBtn>
           </SearchForm>

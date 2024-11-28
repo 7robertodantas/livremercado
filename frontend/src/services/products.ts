@@ -14,11 +14,17 @@ export async function getProductById({ id }: { id: string }): Promise<Product> {
   return result;
 }
 
-export async function listProducts({ page, size }: { page: number, size: number }): Promise<Page<Product>> {
+export async function listProducts({ page, size, search }: { page: number, size: number, search: string }): Promise<Page<Product>> {
   const params = new URLSearchParams({
     'page': page ? page.toString() : '0',
     'size': size ? size.toString() : '10'
   });
+
+  if (search) {
+    params.append('search', search);
+  }
+
+  console.log('listing products by ', params);
 
   const response = await fetch(`http://localhost:4000/products?${params}`, {
     method: 'GET',

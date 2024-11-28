@@ -70,7 +70,7 @@ export const Panel = styled.div`
     gap: 20px;
     padding: 40px;
     border-radius: 10px;
-    
+
     > div:first-child {
         flex: 0 0 70%;
     }
@@ -107,7 +107,7 @@ export const Gallery = styled.div`
     height: 530px;
 
     > img {
-        height: 73%;
+        max-width: 450px;
     }
 `;
 

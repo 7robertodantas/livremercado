@@ -23,10 +23,10 @@ const NavFooter = styled.footer`
   justify-content: center;
 `
 
-const Footer = ({ text } : FooterProps) => {
+const Footer = () => {
   return (
     <NavFooter>
-      {text}
+      Copyright © 1999-2024 livre mercado.
     </NavFooter>
   );
 };

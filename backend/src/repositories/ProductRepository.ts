@@ -19,15 +19,19 @@ export const createProduct = async (product: Product): Promise<void> => {
   });
 };
 
-export const getProducts = async (page: number, size: number): Promise<Page<Product>> => {
-  const offset = (page) * size;
+export const getProducts = async (page: number, size: number, search?: string): Promise<Page<Product>> => {
+  const offset = page * size;
+  const searchQuery = search ? `%${search}%` : null;
+  const searchCondition = searchQuery ? `WHERE p.title LIKE ?` : '';
+  const queryParams = searchQuery ? [searchQuery, size, offset] : [size, offset];
+
   return new Promise((resolve, reject) => {
-    db.get(`SELECT COUNT(*) as count FROM product`, [], (err, result : { count: number }) => {
+    db.get(`SELECT COUNT(*) as count FROM product p ${searchCondition}`, searchQuery ? [searchQuery] : [], (err, result: { count: number }) => {
       if (err) {
         reject(err);
       } else {
         const totalElements = result.count;
-    
+
         db.all(`
           SELECT 
             p.id,
@@ -39,8 +43,9 @@ export const getProducts = async (page: number, size: number): Promise<Page<Prod
             p.is_favorite as isFavorite,
             p.seller_id as sellerId
           FROM product p
+          ${searchCondition}
           LIMIT ? OFFSET ?
-        `, [size, offset], (err, rows) => {
+        `, queryParams, (err, rows) => {
           if (err) {
             reject(err);
           } else {

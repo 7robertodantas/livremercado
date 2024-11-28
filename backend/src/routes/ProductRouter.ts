@@ -12,7 +12,8 @@ const router = Router();
 router.get('/', async (req, res) => {
     const page : number = req.query.page ? parseInt(req.query.page as string, 10) : 0;
     const size : number = req.query.size ? parseInt(req.query.size as string, 10) : 10;
-    const productsPage : Page<Product> = await getProducts(page, size);
+    const search : string = req.query.search ? req.query.search as string : '';
+    const productsPage : Page<Product> = await getProducts(page, size, search);
     res.status(200).send(productsPage);
 });
 

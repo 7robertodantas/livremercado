@@ -25,35 +25,39 @@ const Landing = styled.div`
 export interface LandingProductsProps {
   page: number;
   size: number;
+  search: string;
 }
 
-const getProductsUrl = (page: number) => {
+const getProductsUrl = (page: number, search: string) => {
   const params = new URLSearchParams({
     'page': page.toString(),
   });
+
+  if (search) {
+    params.append('search', search);
+  }
+
   return `/products?${params}`;
 };
 
-const LandingProducts = ({ page, size } : LandingProductsProps) => {
+const LandingProducts = ({ page, size, search } : LandingProductsProps) => {
   const [productsPage, setProductsPage] = useState<Page<Product>>(PageFactory.emptyPage<Product>());
 
   useEffect(() => {
-    listProducts({page , size}).then(setProductsPage);
-  }, [page, size]);
+    listProducts({page , size, search}).then(setProductsPage);
+  }, [page, size, search]);
 
 
   const productCards = productsPage.items?.map( (product) => { return (<ProductCard key={product.id} product={product} />) });
 
   return (
     <LandingPage>
-      {productsPage.hasPreviousPage && <NavButton icon='<' url={getProductsUrl(productsPage.previousPage)} />}
+      {productsPage.hasPreviousPage && <NavButton icon='<' url={getProductsUrl(productsPage.previousPage, search)} />}
       <Landing>
         {productCards}
       </Landing>
-      {productsPage.hasNextPage && <NavButton icon='>' url={getProductsUrl(productsPage.nextPage)} />}
+      {productsPage.hasNextPage && <NavButton icon='>' url={getProductsUrl(productsPage.nextPage, search)} />}
     </LandingPage>
-
-    
   );
 };
 

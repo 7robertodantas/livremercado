@@ -119,7 +119,7 @@ export default function ProductPage() {
   return (
     <>
     <ContainerProductDetails>
-      <Header title="Detalhes do Produto" links={[]} />
+      <Header />
       <ContainerWrapper>
         <Wrapper>
           <div>
@@ -209,7 +209,7 @@ export default function ProductPage() {
           </div>
         </Wrapper>
       </ContainerWrapper>
-      <Footer text="texto footer" />
+      <Footer />
     </ContainerProductDetails>
     
     </>

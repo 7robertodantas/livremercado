@@ -13,28 +13,12 @@ const Page = styled.div`
   height: 100vh;  
 `
 
-const header: HeaderProps = {
-  title: 'Livre Mercado',
-  links: [{
-    title: 'Home',
-    href: '/'
-  },
-  {
-    title: 'Carrinho',
-    href: '/checkout'
-  }]
-};
-
-const footer: FooterProps = {
-  text: 'Copyright © 1999-2024 livre mercado.'
-};
-
 export default function MainLayout({ children }: ChildrenProps) {
   return (
     <Page>
-      <Header {...header}></Header>
+      <Header />
       <Main>{children}</Main>
-      <Footer {...footer}></Footer>
+      <Footer />
     </Page>
   );
 }

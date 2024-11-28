@@ -1,6 +1,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --c0: #000000;
+  --c1: #FFFFFF;
+  --c2: #EBEBEB;
+  --c3: #D3D2D2;
+  --c31: #B0B0B0;
+  --c4: #FFE600;
+  --c5: #00A650;
+  --c6: #3483FA;
+  --c7: #1C4789;
+  --c8: #D94A4A;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,7 +29,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;

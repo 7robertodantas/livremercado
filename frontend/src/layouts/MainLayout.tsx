@@ -15,6 +15,7 @@ const Page = styled.div`
 
 const header: HeaderProps = {
   title: 'Livre Mercado',
+  subtitle: 'O lugar onde tudo se encontra!',
   links: [{
     title: 'Home',
     href: '/'

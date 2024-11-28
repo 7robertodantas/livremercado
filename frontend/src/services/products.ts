@@ -2,7 +2,6 @@
 
 import { Page } from "@/types/Page";
 import { Product } from "@/types/Product";
-import { CartItem } from "@/types/CartItem";
 
 export async function getProductById({ id }: { id: string }): Promise<Product> {
   const response = await fetch(`http://localhost:4000/products/${id}`, {

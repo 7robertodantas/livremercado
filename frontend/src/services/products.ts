@@ -30,14 +30,3 @@ export async function listProducts({ page, size }: { page: number, size: number 
   const result = await response.json();
   return result;
 }
-
-export async function listCartItems(): Promise<CartItem[]> {
-  const response = await fetch(`http://localhost:4000/cart`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-  const result = await response.json();
-  return result;
-}

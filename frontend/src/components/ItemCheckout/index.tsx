@@ -4,14 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Product } from "@/types/Product";
 import styled from "styled-components";
 
-export interface ItemCheckoutProps {
-    product: Product,
-    image: string,
-    quantity: number,
-    onRemove: () => void,
-    onUpdateQuantity: (newQuantity: number) => void,
-}
-
 const ItemCheckoutDiv = styled.div`
     display: flex;
     align-items: center;
@@ -58,6 +50,7 @@ const CountNumber = styled.div`
 const Image = styled.img`
     object-fit: cover;
     border-radius: 5px;
+    max-width: 100px;
 `;
 
 const ButtonDiv = styled.div`
@@ -84,24 +77,31 @@ const Button = styled.button<{variant: "add" | "remove"}>`
     }
 `;
 
-
+export interface ItemCheckoutProps {
+    product: Product,
+    image: string,
+    quantity: number,
+    onRemove: () => Promise<void>,
+    onUpdateQuantity: (newQuantity: number) => Promise<void>,
+}
 
 const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : ItemCheckoutProps) => {
     const [productCount, setProductCount] = useState(quantity);
-    useEffect(() => {
-        onUpdateQuantity(productCount)
-        if(productCount === 0) onRemove();
-    }, [productCount]);
-    const handleAddProduct = () => {
-        const newCount = productCount+1;
+
+    const handleMinus = async () => {
+        const newCount = productCount - 1;
         setProductCount(newCount);
     }
-    const handleRemoveProduct = () => {
-        if(productCount > 0){
-            const newCount = productCount-1;
-            setProductCount(newCount);
-        }
+
+    const handlePlus = async () => {
+        const newCount = productCount + 1;
+        setProductCount(newCount);
     }
+
+    useEffect(() => {
+        if (productCount <= 0) onRemove();
+        else onUpdateQuantity(productCount);
+    }, [productCount]);
 
     return(
         <ItemCheckoutDiv>
@@ -112,10 +112,10 @@ const ItemCheckout = ({image, product, quantity, onRemove, onUpdateQuantity} : I
             </DetailsDiv>
             <CountNumber>{productCount}</CountNumber>
             <ButtonDiv>
-                <Button variant="remove" onClick={handleRemoveProduct}>
+                <Button variant="remove" onClick={handleMinus}>
                     -
                 </Button>
-                <Button variant="add" onClick={handleAddProduct}>
+                <Button variant="add" onClick={handlePlus}>
                     +
                 </Button>
             </ButtonDiv>

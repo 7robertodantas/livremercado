@@ -1,6 +1,4 @@
-export interface Page<T> {
-    items: T[];
-    count: number;
+export interface PageMetadata {
     total: number;
     currentPage: number;
     nextPage: number;
@@ -10,6 +8,10 @@ export interface Page<T> {
     hasPreviousPage: boolean;
 }
 
+export interface Page<T> extends PageMetadata {
+    items: T[];
+    count: number;
+}
 
 export class PageFactory {
     static emptyPage<T>(): Page<T> {

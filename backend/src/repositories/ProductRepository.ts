@@ -30,7 +30,7 @@ export const getProducts = async (page: number, size: number, search?: string): 
       if (err) {
         reject(err);
       } else {
-        const totalElements = result.count;
+        const metadata = PageFactory.metadata(page, size, result.count);
 
         db.all(`
           SELECT 
@@ -49,7 +49,7 @@ export const getProducts = async (page: number, size: number, search?: string): 
           if (err) {
             reject(err);
           } else {
-            resolve(PageFactory.of<Product>(page, size, rows as Product[], totalElements));
+            resolve(PageFactory.of<Product>(rows as Product[], metadata));
           }
         });
       }

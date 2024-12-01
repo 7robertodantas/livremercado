@@ -2,9 +2,8 @@
 
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { getCartMetadata } from "@/services/checkout";
+import { useContext } from 'react';
+import { CartContext } from "@/context/CartContext";
 
 const CartButton = styled.button`
   background: var(--c6);
@@ -29,28 +28,15 @@ const CartButton = styled.button`
 
 const CartButtonComponent = () => {
   const router = useRouter();
-  const [cartCount, setCartCount] = useState(0);
+  const {total} = useContext(CartContext);
 
   const handleCartButtonClick = () => {
     router.push('/checkout');
   };
 
-    useEffect(() => {
-        const fetchCartMetadata = async () => {
-            try {
-                const metadata = await getCartMetadata();
-                setCartCount(metadata.total);
-            } catch (error) {
-                console.error('Failed to fetch cart metadata:', error);
-            }
-        };
-
-        fetchCartMetadata();
-    }, []);
-
   return (
     <CartButton onClick={handleCartButtonClick}>
-            Carrinho ({cartCount})
+            Carrinho ({total})
             <span className="material-symbols-outlined">shopping_cart</span>
     </CartButton>
   );

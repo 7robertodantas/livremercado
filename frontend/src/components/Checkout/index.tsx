@@ -3,8 +3,9 @@
 import styled from "styled-components";
 import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { deleteCartItem, listCartItems, updateCartItem } from "@/services/checkout";
+import { CartContext } from "@/context/CartContext";
 
 const CheckoutItemsDiv = styled.div`
   display: flex;
@@ -51,6 +52,7 @@ const EmptyCart = styled.span`
 `
 
 const Checkout = () => {
+  const { setTotal } = useContext(CartContext);
   const [productList, setProductList] = useState<CartItem[]>([]);
   const [totalValue, setTotalValue] = useState<number>(0);
 
@@ -62,6 +64,7 @@ const Checkout = () => {
   const loadCart = async () => {
     const page = await listCartItems();
     setProductList(page.items);
+    setTotal(page.total);
   };
 
   const handleUpdateQuantity = async (id: string, newQuantity: number) => {

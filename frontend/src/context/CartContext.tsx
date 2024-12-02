@@ -40,7 +40,12 @@ const CartContextProvider = ({ children } : ChildrenProps) => {
             loadCart();
         },
         addProduct(productId) {
-            updateCartItem(productId, 1);
+            const found = this.items.find(item => item.product.id === productId);
+            if (found) {
+                this.updateQuantity(productId, found.quantity + 1)
+            } else {
+                updateCartItem(productId, 1);
+            }
             this.refresh();
         },
         updateQuantity(productId, newQuantity) {

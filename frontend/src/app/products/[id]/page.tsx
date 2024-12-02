@@ -51,227 +51,230 @@ import {
 import { useCartContext } from "@/context/CartContext";
 import MainLayout from "@/layouts/MainLayout";
 
+interface ProductState {
+  product: Product | null;
+  seller: Seller | null;
+  isInCart: boolean;
+  loading: boolean;
+}
+
 export default function ProductPage() {
   const cart = useCartContext();
   const params = useParams();
   const router = useRouter();
+
+  const productId = Array.isArray(params.id) ? params.id[0] : params.id || "";
+  const [state, setState] = useState<ProductState>({ product : null, seller: null, isInCart: false, loading: true });
+
+  const loadProduct = async () => {
+    const product: Product = await getProductById({ id: productId });
+    setState((prevState) => ({ ...prevState, product }));
+  };
+
+  const loadSeller = async () => {
+    if (!state.product || !state.product.sellerId) return;
+    const seller: Seller = await getSellerById({ id: state.product.sellerId });
+    setState((prevState) => ({ ...prevState, seller }));
+  }
+
+  const loadIsInCart = async () => {
+    const isInCart = await isProductInCart(productId);
+    setState((prevState) => ({ ...prevState, isInCart }));
+  }
   
-  const [product, setProduct] = useState<Product | null>(null);
-  const [seller, setSeller] = useState<Seller | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [isInCart, setIsInCart] = useState(false);
-
-  const fetchData = async () : Promise<void> => {
+  const fetchData = async (): Promise<void> => {
     try {
-      if (params?.id) {
-        const productData = await getProductById({ id: Array.isArray(params.id) ? params.id[0] : params.id });
-        setProduct(productData);
-        setIsFavorited(productData.isFavorite);
-
-        if (productData.sellerId) {
-          const sellerData = await getSellerById({ id: String(productData.sellerId) });
-          setSeller(sellerData);
-        } else {
-          console.warn("Produto não possui um sellerId:", productData);
-        }
-
-        if(productData.id) {
-          const existProductInCart = await isProductInCart(productData.id);        
-          setIsInCart(existProductInCart);
-        }
-      }
+      setState((prevState) => ({ ...prevState, loading: true }));
+      await loadProduct();
+      await loadSeller();
+      await loadIsInCart();
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {
-      setLoading(false);
+      setState((prevState) => ({ ...prevState, loading: false }));
     }
-  }
+  };
 
   useEffect(() => {
     fetchData();
   }, [params, cart.items]);
 
+
   const toggleFavorite = async () => {
-    if (!product) return;
-  
-    const updatedFavorite = !isFavorited;
-  
+    if (!state.product) return;
+
+    const updatedFavorite = !state.product.isFavorite;
+
     try {
-      setIsFavorited(updatedFavorite);
-  
-      await updateProductFavorite(product.id, updatedFavorite);
-  
+      await updateProductFavorite(state.product.id, updatedFavorite);
       console.log(
-        `Produto "${product.title}" ${
+        `Produto "${state.product.title}" ${
           updatedFavorite ? "adicionado aos" : "removido dos"
         } favoritos.`
       );
+      await loadProduct();
     } catch (error) {
-      setIsFavorited(!updatedFavorite);
-  
       console.error(
-        `Erro ao atualizar favorito para o produto "${product.title}":`,
+        `Erro ao atualizar favorito para o produto "${state.product.title}":`,
         error
       );
     }
   };
 
   const handleAddToCart = async () => {
-    if (!product) return;
-    
+    if (!state.product) return;
+
     try {
-      await cart.addProduct(product.id);
-      console.log(`Produto "${product.title}" adicionado ao carrinho.`);
+      cart.addProduct(state.product.id);
+      console.log(`Produto "${state.product.title}" adicionado ao carrinho.`);
     } catch (error) {
       console.error("Erro ao adicionar produto ao carrinho:", error);
     }
   };
 
   const handleRemoveFromCart = async () => {
-    if (!product) return;
+    if (!state.product) return;
 
     try {
-      await cart.removeProduct(product.id);
-      console.log(`Produto "${product.title}" removido do carrinho.`);
+      cart.removeProduct(state.product.id);
+      console.log(`Produto "${state.product.title}" removido do carrinho.`);
     } catch (error) {
       console.error("Erro ao remover produto do carrinho:", error);
     }
-  }
+  };
 
   const goToCheckout = async () => {
     router.push("/checkout");
-  }; 
+  };
 
   const handleBuyNow = async () => {
-    if (!product) return;
-  
+    if (!state.product) return;
+
     try {
-      await cart.addProduct(product.id);
+      cart.addProduct(state.product.id);
       router.push("/checkout");
-      console.log(`Produto "${product.title}" adicionado ao carrinho e enviado a tela.`);
+      console.log(`Produto "${state.product.title}" adicionado ao carrinho e enviado a tela.`);
     } catch (error) {
       console.error("Erro ao adicionar produto ao carrinho:", error);
     }
   };
-  
 
-  if (loading) {
+  if (state.loading) {
     return <div>Carregando detalhes do produto...</div>;
   }
 
-  if (!product) {
+  if (!state.product) {
     return <div>Produto não encontrado.</div>;
   }
 
   return (
     <MainLayout>
-    <ContainerProductDetails>      
-      <ContainerWrapper>
-        <Wrapper>
-          <div>
-            <Container>
-              <Row>
-                <a href="#" onClick={(e) => e.preventDefault()}>
-                  Compartilhar
-                </a>
-                <a href="#" onClick={(e) => e.preventDefault()}>
-                  Vender um igual
-                </a>
-              </Row>
+      <ContainerProductDetails>
+        <ContainerWrapper>
+          <Wrapper>
+            <div>
+              <Container>
+                <Row>
+                  <a href="#" onClick={(e) => e.preventDefault()}>
+                    Compartilhar
+                  </a>
+                  <a href="#" onClick={(e) => e.preventDefault()}>
+                    Vender um igual
+                  </a>
+                </Row>
 
-              <Panel>
-                <Column>
-                  <ColumnProduct>
-                    <ColumnProductChild>
-                      <Gallery>
-                        <img alt={product.title} src={product.imageUrl} />
-                      </Gallery>
-                      <ProductContainerHeader>
-                        <ProductActionCategory>{product.category}</ProductActionCategory>
-                        <ProductActionRowTitle>
-                          <h1>{product.title}</h1>
-                          {isFavorited ? (
-                            <HiHeart
-                              color="#ff5252"
-                              size={28}
-                              onClick={toggleFavorite}
-                              aria-label="Remover dos favoritos"
-                              role="button"
-                            />
-                          ) : (
-                            <HiOutlineHeart
-                              color="var(--color-blue)"
-                              size={28}
-                              onClick={toggleFavorite}
-                              aria-label="Adicionar aos favoritos"
-                              role="button"
-                            />
-                          )}
-                        </ProductActionRowTitle>
+                <Panel>
+                  <Column>
+                    <ColumnProduct>
+                      <ColumnProductChild>
+                        <Gallery>
+                          <img alt={state.product.title} src={state.product.imageUrl} />
+                        </Gallery>
+                        <ProductContainerHeader>
+                          <ProductActionCategory>{state.product.category}</ProductActionCategory>
+                          <ProductActionRowTitle>
+                            <h1>{state.product.title}</h1>
+                            {state.product.isFavorite ? (
+                              <HiHeart
+                                color="#ff5252"
+                                size={28}
+                                onClick={toggleFavorite}
+                                aria-label="Remover dos favoritos"
+                                role="button"
+                              />
+                            ) : (
+                              <HiOutlineHeart
+                                color="var(--color-blue)"
+                                size={28}
+                                onClick={toggleFavorite}
+                                aria-label="Adicionar aos favoritos"
+                                role="button"
+                              />
+                            )}
+                          </ProductActionRowTitle>
 
-                        <ProductActionPriceCard>
-                          <ProductActionPriceRow>
-                            <span className="symbol">R$</span>
-                            <span className="fraction">{product.price.toFixed(2)}</span>
-                          </ProductActionPriceRow>
-                        </ProductActionPriceCard>
-                      </ProductContainerHeader>
-                    </ColumnProductChild>
-                  </ColumnProduct>
-                  <Info description={product.description} />
-                </Column>
+                          <ProductActionPriceCard>
+                            <ProductActionPriceRow>
+                              <span className="symbol">R$</span>
+                              <span className="fraction">{state.product.price.toFixed(2)}</span>
+                            </ProductActionPriceRow>
+                          </ProductActionPriceCard>
+                        </ProductContainerHeader>
+                      </ColumnProductChild>
+                    </ColumnProduct>
+                    <Info description={state.product.description} />
+                  </Column>
 
-                <Column>
-                  <ProductActionContainer>
-                    <ProductActionMethodCard>
-                      <HiOutlineCheck size={24} color="var(--color-green)" />
-                      <div>
-                        <span className="title">Frete grátis</span>
-                        <span className="details">Benefício Lorem Ipsum</span>
-                      </div>
-                    </ProductActionMethodCard>
+                  <Column>
+                    <ProductActionContainer>
+                      <ProductActionMethodCard>
+                        <HiOutlineCheck size={24} color="var(--color-green)" />
+                        <div>
+                          <span className="title">Frete grátis</span>
+                          <span className="details">Benefício Lorem Ipsum</span>
+                        </div>
+                      </ProductActionMethodCard>
 
-                    <ProductActionActions>
-                      {isInCart ? (
-                        <>
-                          <ProductActionPrimaryButton onClick={goToCheckout}>
-                            Ir para o Carrinho
-                          </ProductActionPrimaryButton>
-                          <ProductActionSecondaryButton onClick={handleRemoveFromCart}>
-                            Remover do carrinho
-                          </ProductActionSecondaryButton>
-                        </>
-                      ) : (
-                        <>
-                          <ProductActionPrimaryButton onClick={handleBuyNow}>
-                            Comprar agora
-                          </ProductActionPrimaryButton>
-                          <ProductActionSecondaryButton onClick={handleAddToCart}>
-                            Adicionar ao carrinho
-                          </ProductActionSecondaryButton>
-                        </>
-                      )}
-                    </ProductActionActions>
+                      <ProductActionActions>
+                        {state.isInCart ? (
+                          <>
+                            <ProductActionPrimaryButton onClick={goToCheckout}>
+                              Ir para o Carrinho
+                            </ProductActionPrimaryButton>
+                            <ProductActionSecondaryButton onClick={handleRemoveFromCart}>
+                              Remover do carrinho
+                            </ProductActionSecondaryButton>
+                          </>
+                        ) : (
+                          <>
+                            <ProductActionPrimaryButton onClick={handleBuyNow}>
+                              Comprar agora
+                            </ProductActionPrimaryButton>
+                            <ProductActionSecondaryButton onClick={handleAddToCart}>
+                              Adicionar ao carrinho
+                            </ProductActionSecondaryButton>
+                          </>
+                        )}
+                      </ProductActionActions>
 
-                    <ProductActionBenefits>
-                      <li>
-                        <HiOutlineShieldCheck color="var(--color-gray)" size={30} />
-                        <p>
-                          Compra Garantida, receba o produto que está esperando ou devolvemos
-                          seu dinheiro.
-                        </p>
-                      </li>
-                    </ProductActionBenefits>
-                  </ProductActionContainer>
-                  {seller && <SellerInfo seller={seller} />}
-                </Column>
-              </Panel>
-            </Container>
-          </div>
-        </Wrapper>
-      </ContainerWrapper>
-    </ContainerProductDetails>
+                      <ProductActionBenefits>
+                        <li>
+                          <HiOutlineShieldCheck color="var(--color-gray)" size={30} />
+                          <p>
+                            Compra Garantida, receba o produto que está esperando ou devolvemos
+                            seu dinheiro.
+                          </p>
+                        </li>
+                      </ProductActionBenefits>
+                    </ProductActionContainer>
+                    {state.seller && <SellerInfo seller={state.seller} />}
+                  </Column>
+                </Panel>
+              </Container>
+            </div>
+          </Wrapper>
+        </ContainerWrapper>
+      </ContainerProductDetails>
     </MainLayout>
   );
 }

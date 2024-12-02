@@ -1,6 +1,6 @@
 'use client';
 
-import { addCartItem, deleteCartItem, getCart, updateCartItem } from '@/services/checkout';
+import { addProductToCart, deleteCartItem, getCart, updateCartItem } from '@/services/checkout';
 import { ChildrenProps } from '@/types';
 import { CartItem } from '@/types/CartItem';
 import { Page, PageFactory } from '@/types/Page';
@@ -48,7 +48,7 @@ const CartContextProvider = ({ children } : ChildrenProps) => {
             return this.items.some(item => item.product.id == productId);
         },
         async addProduct(productId) {
-            await addCartItem(productId);
+            await addProductToCart(productId);
             this.refresh();
         },
         async updateQuantity(productId, newQuantity) {

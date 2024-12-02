@@ -14,17 +14,6 @@ export async function getCart(): Promise<Page<CartItem>> {
     return result;
 }
 
-export async function addCartItem(productId: string): Promise<void> {
-  await fetch(`http://localhost:4000/cart/products`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ productId }),
-  });
-}
-
-
 export async function updateCartItem(productId: string, quantity: number): Promise<void> {
   await fetch(`http://localhost:4000/cart/products/${productId}`, {
     method: 'PUT',
@@ -44,13 +33,13 @@ export async function deleteCartItem(productId: string): Promise<void> {
   });
 }
 
-export async function addProductToCart(productId: string, quantity: number): Promise<void> {
+export async function addProductToCart(productId: string): Promise<void> {
   await fetch(`http://localhost:4000/cart/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ productId, quantity }),
+    body: JSON.stringify({ productId }),
   });
 }
 

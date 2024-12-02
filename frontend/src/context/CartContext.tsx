@@ -1,3 +1,5 @@
+'use client';
+
 import { addCartItem, deleteCartItem, getCart, updateCartItem } from '@/services/checkout';
 import { ChildrenProps } from '@/types';
 import { CartItem } from '@/types/CartItem';

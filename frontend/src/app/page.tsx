@@ -1,12 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from "next/navigation";
+import PageComponent from './products/page';
 
-export default function PageComponent() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push('/products?page=0');
-  }, [router]);
-}
+export default PageComponent;

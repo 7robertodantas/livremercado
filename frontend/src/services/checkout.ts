@@ -1,4 +1,4 @@
-'use server'
+'use server';
 
 import { CartItem } from "@/types/CartItem";
 import { Page } from "@/types/Page";

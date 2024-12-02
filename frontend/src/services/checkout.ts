@@ -1,9 +1,9 @@
-'use server'
+'use server';
 
 import { CartItem } from "@/types/CartItem";
 import { Page } from "@/types/Page";
 
-export async function listCartItems(): Promise<Page<CartItem>> {
+export async function getCart(): Promise<Page<CartItem>> {
     const response = await fetch(`http://localhost:4000/cart`, {
       method: 'GET',
       headers: {
@@ -33,13 +33,13 @@ export async function deleteCartItem(productId: string): Promise<void> {
   });
 }
 
-export async function addProductToCart(productId: string, quantity: number): Promise<void> {
+export async function addProductToCart(productId: string): Promise<void> {
   await fetch(`http://localhost:4000/cart/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ productId, quantity }),
+    body: JSON.stringify({ productId }),
   });
 }
 

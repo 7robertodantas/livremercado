@@ -1,6 +1,6 @@
 import db from "../database";
 import { CartItem } from "../schemas/CartItem";
-import { Page, PageFactory } from "../schemas/Page";
+import { Page, PageFactory, PageMetadata } from "../schemas/Page";
 
 interface CartItemQuery {
   cartItemId: number;
@@ -15,29 +15,57 @@ interface CartItemQuery {
   quantity: number;
 };
 
-const getCartItems = async (): Promise<CartItemQuery[]> => {
+export const getCartItems = async (page: number, size: number): Promise<Page<CartItem>> => {
+  const offset = page * size;
+  const queryParams = [size, offset];
+
   return new Promise((resolve, reject) => {
-    db.all(`
-      SELECT 
-        c.id as cartItemId, 
-        p.id as productId, 
-        p.title, 
-        p.description, 
-        p.price, 
-        p.category, 
-        p.image_url as imageUrl,
-        p.is_favorite as isFavorite,
-        p.seller_id as sellerId,
-        c.quantity 
-      FROM cart_item c 
-      LEFT JOIN product p ON c.product_id = p.id
-    `,
-      (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows as CartItemQuery[]);
-        }
+    db.get(`SELECT COUNT(*) as total FROM cart_item c`, [], (err, result: { total: number }) => {
+      if (err) {
+        reject(err);
+      } else {
+        const metadata = PageFactory.metadata(page, size, result.total);
+
+        db.all(`
+          SELECT 
+            c.id as cartItemId, 
+            p.id as productId, 
+            p.title, 
+            p.description, 
+            p.price, 
+            p.category, 
+            p.image_url as imageUrl,
+            p.is_favorite as isFavorite,
+            p.seller_id as sellerId,
+            c.quantity 
+          FROM cart_item c 
+          LEFT JOIN product p ON c.product_id = p.id
+          LIMIT ? OFFSET ?
+        `, queryParams,
+          (err, rows : CartItemQuery[]) => {
+            if (err) {
+              reject(err);
+            } else {
+              
+              const items : CartItem[] = rows.map((item: CartItemQuery) => ({
+                id: item.cartItemId,
+                product: {
+                  id: item.productId,
+                  title: item.title,
+                  description: item.description,
+                  price: item.price,
+                  category: item.category,
+                  imageUrl: item.imageUrl,
+                  isFavorite: item.isFavorite,
+                  sellerId: item.sellerId,
+                },
+                quantity: item.quantity
+              }));
+
+              resolve(PageFactory.of<CartItem>(items, metadata));
+            }
+        });
+      }
     });
   });
 };
@@ -55,26 +83,6 @@ export const addProductToCart = async (productId: string, quantity: number) => {
         }
     });
   });
-};
-
-export const getCart = async () : Promise<Page<CartItem>> => {
-  const cartItems = await getCartItems();
-  const items = cartItems.map((item: CartItemQuery) => ({
-    id: item.cartItemId,
-    product: {
-      id: item.productId,
-      title: item.title,
-      description: item.description,
-      price: item.price,
-      category: item.category,
-      imageUrl: item.imageUrl,
-      isFavorite: item.isFavorite,
-      sellerId: item.sellerId,
-    },
-    quantity: item.quantity
-  }));
-  
-  return PageFactory.of(0, items.length, items as CartItem[], items.length);
 };
 
 export const updateProductInCart = async (productId: string, quantity: number) => {

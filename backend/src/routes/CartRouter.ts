@@ -1,5 +1,5 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { addProductToCart, getCart, isProductInCart, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
+import { Router, Request, Response } from 'express';
+import { addProductToCart, getCartItems, isProductInCart, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
 
 const router = Router();
 
@@ -7,23 +7,24 @@ const router = Router();
  * Retrieve the cart
  */
 router.get('/', async (req, res) => {
-    const products = await getCart();
-    res.status(200).send(products);
+    const page : number = req.query.page ? parseInt(req.query.page as string, 10) : 0;
+    const size : number = req.query.size ? parseInt(req.query.size as string, 10) : 10;
+    const items = await getCartItems(page, size);
+    res.status(200).send(items);
 });
-
 
 /**
  * Add a product to the cart
  */
 router.post('/products', async (req, res) => {
-    const { productId, quantity } = req.body;
-    if (!productId || !quantity) {
+    const { productId } = req.body;
+    if (!productId) {
         res.status(400).send({ message: 'Product ID and quantity are required' });
         return;
     }
 
     try {
-        const updatedCart = await addProductToCart(productId, quantity);
+        const updatedCart = await addProductToCart(productId, 1);
         res.status(200).send(updatedCart);
         return;
     } catch (error) {

@@ -1,4 +1,4 @@
-'use server'
+'use server';
 
 import { Page } from "@/types/Page";
 import { Product } from "@/types/Product";

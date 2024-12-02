@@ -14,10 +14,19 @@ if (environment === 'dev') {
   seedDatabase();
 }
 
+const requestLogger = (req: Request, res: Response, next: Function) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} in ${duration}ms`);
+  });
+  next();
+};
 
 const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(requestLogger);
 app.use('/products', ProductRouter);
 app.use('/cart', CartRouter);
 app.use('/seller', SellerRouter);

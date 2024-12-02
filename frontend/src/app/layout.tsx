@@ -1,10 +1,10 @@
-import { Inter, Poppins } from 'next/font/google'
-import type { Metadata } from "next";
+'use client';
+
 import 'material-icons/iconfont/material-icons.css'
 import "./globals.css";
 
-
-const inter = Inter({ subsets: ['latin'] })
+import { Poppins } from 'next/font/google'
+import CartContextProvider from '@/context/CartContext';
 
 const poppins = Poppins({
   weight: ['300', '400', '500', '600', '700', '800'],
@@ -12,11 +12,6 @@ const poppins = Poppins({
   subsets: ['latin'],
   display: 'swap',
 })
-
-export const metadata: Metadata = {
-  title: "Livre Mercado",
-  description: "O lugar onde tudo se encontra!",
-};
 
 export default function RootLayout({
   children,
@@ -26,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">      
       <body className={poppins.className}>
-        {children}
+        <CartContextProvider>
+          {children}
+        </CartContextProvider>
       </body>
     </html>
   );

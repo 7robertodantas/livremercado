@@ -5,7 +5,6 @@ import Header from '@/components/Header';
 import Main from '@/components/Main'
 import styled from 'styled-components';
 import { ChildrenProps } from '@/types';
-import CartContextProvider, {  } from '@/context/CartContext';
 
 const Page = styled.div`
   display: flex;
@@ -16,12 +15,10 @@ const Page = styled.div`
 export default function MainLayout({ children }: ChildrenProps) {
 
   return (
-    <CartContextProvider>
       <Page>
         <Header />
         <Main>{children}</Main>
         <Footer />
       </Page>
-    </CartContextProvider>
   );
 }

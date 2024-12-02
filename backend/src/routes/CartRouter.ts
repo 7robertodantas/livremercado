@@ -17,14 +17,14 @@ router.get('/', async (req, res) => {
  * Add a product to the cart
  */
 router.post('/products', async (req, res) => {
-    const { productId, quantity } = req.body;
-    if (!productId || !quantity) {
+    const { productId } = req.body;
+    if (!productId) {
         res.status(400).send({ message: 'Product ID and quantity are required' });
         return;
     }
 
     try {
-        const updatedCart = await addProductToCart(productId, quantity);
+        const updatedCart = await addProductToCart(productId, 1);
         res.status(200).send(updatedCart);
         return;
     } catch (error) {

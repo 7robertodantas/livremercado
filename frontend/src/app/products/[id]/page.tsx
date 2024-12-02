@@ -48,8 +48,11 @@ import {
   StyledSellerInfo,
   Wrapper,
 } from "./styles";
+import { useCartContext } from "@/context/CartContext";
+import MainLayout from "@/layouts/MainLayout";
 
 export default function ProductPage() {
+  const cart = useCartContext();
   const params = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<Seller | null>(null);
@@ -116,10 +119,17 @@ export default function ProductPage() {
     return <div>Produto não encontrado.</div>;
   }
 
+  const handleAddProductToCart = async () => {
+    cart.addProduct(product.id);
+  }
+
+  const handleRemoveProductFromCart = async () => {
+    cart.removeProduct(product.id);
+  }
+
   return (
-    <>
-    <ContainerProductDetails>
-      <Header />
+    <MainLayout>
+    <ContainerProductDetails>      
       <ContainerWrapper>
         <Wrapper>
           <div>
@@ -189,7 +199,13 @@ export default function ProductPage() {
                       <ProductActionButton solid>
                         Comprar agora
                       </ProductActionButton>
-                      <ProductActionButton>Adicionar ao carrinho</ProductActionButton>
+                      {cart.containsProduct(product.id) ? 
+                      <ProductActionButton onClick={handleRemoveProductFromCart}>
+                        Remover do carrinho</ProductActionButton> : 
+                        <ProductActionButton onClick={handleAddProductToCart}>
+                        Adicionar ao carrinho</ProductActionButton>
+                    }
+                      
                     </ProductActionActions>
 
                     <ProductActionBenefits>
@@ -209,10 +225,8 @@ export default function ProductPage() {
           </div>
         </Wrapper>
       </ContainerWrapper>
-      <Footer />
     </ContainerProductDetails>
-    
-    </>
+    </MainLayout>
   );
 }
 

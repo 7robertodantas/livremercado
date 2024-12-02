@@ -1,4 +1,4 @@
-import { deleteCartItem, getCart, updateCartItem } from '@/services/checkout';
+import { addCartItem, deleteCartItem, getCart, updateCartItem } from '@/services/checkout';
 import { ChildrenProps } from '@/types';
 import { CartItem } from '@/types/CartItem';
 import { Page, PageFactory } from '@/types/Page';
@@ -12,6 +12,7 @@ const empty = {
     items: [],
     totalValue: 0,
     totalItems: 0,
+    containsProduct: defaultError,
     refresh: defaultError,
     addProduct: defaultError,
     updateQuantity: defaultError,
@@ -23,6 +24,7 @@ export interface CartContextType {
     totalValue: number;
     totalItems: number;
     refresh: () => void;
+    containsProduct: (productId: string) => boolean;
     addProduct: (productId: string) => void;
     updateQuantity: (productId: string, newQuantity: number) => void;
     removeProduct: (productId: string) => void;
@@ -31,44 +33,39 @@ export interface CartContextType {
 export const CartContext = createContext<CartContextType>(empty);
 
 const CartContextProvider = ({ children } : ChildrenProps) => {
-    const [cart, setCart] = useState<Page<CartItem>>(PageFactory.emptyPage());
-    const value = { 
-        items: cart.items, 
-        totalItems: cart.total, 
-        totalValue: cart.items.reduce((total, { product, quantity }) => total + product.price * quantity, 0), 
-        refresh: () => {
-            loadCart();
+    const [cartItems, setCartItems] = useState<Page<CartItem>>(PageFactory.emptyPage());
+    const cart = { 
+        items: cartItems.items, 
+        totalItems: cartItems.total, 
+        totalValue: cartItems.items.reduce((total, { product, quantity }) => total + product.price * quantity, 0), 
+        async refresh() {
+            const items = await getCart();
+            setCartItems(items);
         },
-        addProduct(productId) {
-            const found = this.items.find(item => item.product.id === productId);
-            if (found) {
-                this.updateQuantity(productId, found.quantity + 1)
-            } else {
-                updateCartItem(productId, 1);
-            }
+        containsProduct(productId) {
+            return this.items.some(item => item.product.id == productId);
+        },
+        async addProduct(productId) {
+            await addCartItem(productId);
             this.refresh();
         },
-        updateQuantity(productId, newQuantity) {
-            updateCartItem(productId, newQuantity);
+        async updateQuantity(productId, newQuantity) {
+            await updateCartItem(productId, newQuantity);
             this.refresh();
         },
-        removeProduct(productId) {
-            deleteCartItem(productId);
+        async removeProduct(productId) {
+            await deleteCartItem(productId);
             this.refresh();
         }
     } as CartContextType;
 
-    const loadCart = async () => {
-        const items = await getCart();
-        setCart(items);
-    }
 
     useEffect(() => {
-        loadCart();
+        cart.refresh();
     }, []);
 
     return (
-        <CartContext.Provider value={value}>
+        <CartContext.Provider value={cart}>
             {children}
         </CartContext.Provider>
     )

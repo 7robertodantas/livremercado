@@ -1,5 +1,5 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { addProductToCart, getCartItems, getCartMetadata, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
+import { Router } from 'express';
+import { addProductToCart, getCartItems, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
 
 const router = Router();
 
@@ -11,20 +11,6 @@ router.get('/', async (req, res) => {
     const size : number = req.query.size ? parseInt(req.query.size as string, 10) : 10;
     const items = await getCartItems(page, size);
     res.status(200).send(items);
-});
-
-/**
- * Retrieve pagination metadata for products in the cart
- */
-router.get('/metadata', async (req, res) => {
-    try {
-        const page : number = req.query.page ? parseInt(req.query.page as string, 10) : 0;
-        const size : number = req.query.size ? parseInt(req.query.size as string, 10) : 10;
-        const metadata = await getCartMetadata(page, size);
-        res.status(200).send(metadata);
-    } catch (error) {
-        res.status(500).send({ message: 'Failed to retrieve cart metadata' });
-    }
 });
 
 /**

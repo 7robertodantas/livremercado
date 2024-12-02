@@ -85,21 +85,6 @@ export const addProductToCart = async (productId: string, quantity: number) => {
   });
 };
 
-export const getCartMetadata = async (page: number, size: number): Promise<PageMetadata> => {
-  return new Promise((resolve, reject) => {
-    db.get(`
-      SELECT COUNT(*) as total 
-      FROM cart_item
-    `, [], (err, row : {total: number;}) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(PageFactory.metadata(page, size, row.total));
-      }
-    });
-  });
-};
-
 export const updateProductInCart = async (productId: string, quantity: number) => {
   return new Promise((resolve, reject) => {
     db.run(`

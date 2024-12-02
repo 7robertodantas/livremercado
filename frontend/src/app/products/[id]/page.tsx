@@ -86,8 +86,7 @@ export default function ProductPage() {
     try {
       setState((prevState) => ({ ...prevState, loading: true }));
       await loadProduct();
-      await loadSeller();
-      await loadIsInCart();
+      await Promise.all([loadSeller(), loadIsInCart()]);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {

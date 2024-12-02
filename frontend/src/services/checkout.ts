@@ -3,7 +3,7 @@
 import { CartItem } from "@/types/CartItem";
 import { Page, PageMetadata } from "@/types/Page";
 
-export async function listCartItems(): Promise<Page<CartItem>> {
+export async function getCart(): Promise<Page<CartItem>> {
     const response = await fetch(`http://localhost:4000/cart`, {
       method: 'GET',
       headers: {
@@ -12,17 +12,6 @@ export async function listCartItems(): Promise<Page<CartItem>> {
     });
     const result = await response.json();
     return result;
-}
-
-export async function getCartMetadata(): Promise<PageMetadata> {
-  const response = await fetch(`http://localhost:4000/cart/metadata`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-  const result = await response.json();
-  return result;
 }
 
 export async function updateCartItem(productId: string, quantity: number): Promise<void> {

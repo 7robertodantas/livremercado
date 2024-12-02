@@ -2,8 +2,7 @@
 
 import styled from "styled-components";
 import { useRouter } from "next/navigation";
-import { useContext } from 'react';
-import { CartContext } from "@/context/CartContext";
+import { useCartContext } from "@/context/CartContext";
 
 const CartButton = styled.button`
   background: var(--c6);
@@ -28,7 +27,7 @@ const CartButton = styled.button`
 
 const CartButtonComponent = () => {
   const router = useRouter();
-  const {total} = useContext(CartContext);
+  const cart = useCartContext();
 
   const handleCartButtonClick = () => {
     router.push('/checkout');
@@ -36,7 +35,7 @@ const CartButtonComponent = () => {
 
   return (
     <CartButton onClick={handleCartButtonClick}>
-            Carrinho ({total})
+            Carrinho ({cart.totalItems})
             <span className="material-symbols-outlined">shopping_cart</span>
     </CartButton>
   );

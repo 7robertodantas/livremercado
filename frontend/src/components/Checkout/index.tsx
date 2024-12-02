@@ -1,11 +1,8 @@
 'use client';
 
 import styled from "styled-components";
-import { CartItem } from "@/types/CartItem";
 import ItemCheckout from "../ItemCheckout";
-import { useState, useEffect, useContext } from 'react';
-import { deleteCartItem, listCartItems, updateCartItem } from "@/services/checkout";
-import { CartContext } from "@/context/CartContext";
+import { useCartContext } from "@/context/CartContext";
 
 const CheckoutItemsDiv = styled.div`
   display: flex;
@@ -52,47 +49,16 @@ const EmptyCart = styled.span`
 `
 
 const Checkout = () => {
-  const { setTotal } = useContext(CartContext);
-  const [productList, setProductList] = useState<CartItem[]>([]);
-  const [totalValue, setTotalValue] = useState<number>(0);
-
-  const loadTotalValue = () => {
-    const newTotalValue = productList.reduce((total, { product, quantity }) => total + product.price * quantity, 0);
-    setTotalValue(newTotalValue);
-  };
-
-  const loadCart = async () => {
-    const page = await listCartItems();
-    setProductList(page.items);
-    setTotal(page.total);
-  };
-
-  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
-    await updateCartItem(id, newQuantity);
-    loadCart();
-  };
-
-  const handleRemoveItem = async (id: string) => {
-    await deleteCartItem(id);
-    loadCart();
-  };
+  const cart = useCartContext();
   
-  useEffect(() => {
-    loadCart();
-  }, []);
-
-  useEffect(() => {
-    loadTotalValue();
-  }, [productList]);
-
-  const productCheckout = productList?.map((product) => {
+  const productCheckout = cart.items?.map((product) => {
     return (
       <ItemCheckout key={product.id}
                     image={product.product.imageUrl}
                     product={product.product}
                     quantity={product.quantity}
-                    onRemove={() => handleRemoveItem(product.product.id)}
-                    onUpdateQuantity={(newQuantity) => handleUpdateQuantity(product.product.id, newQuantity)} />
+                    onRemove={async () => cart.removeProduct(product.product.id)}
+                    onUpdateQuantity={async (newQuantity) => cart.updateQuantity(product.product.id, newQuantity)} />
     );
   });
 
@@ -101,7 +67,7 @@ const Checkout = () => {
       <CheckoutItemsDiv>
         {productCheckout.length > 0 ? (productCheckout) : (<EmptyCart>Carrinho está vazio</EmptyCart>)}
       </CheckoutItemsDiv>
-      <Total>Valor Total: R$ {totalValue}</Total>
+      <Total>Valor Total: R$ {cart.totalValue}</Total>
       <Button>Checkout</Button>
     </div>
   );

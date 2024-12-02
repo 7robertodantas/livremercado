@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "@/types/Product";
 import styled from "styled-components";
 

@@ -14,7 +14,9 @@ import { Product } from "@/types/Product";
 import { Seller } from "@/types/Seller";
 import { getProductById, updateProductFavorite } from "@/services/products";
 import { getSellerById } from "@/services/sellers";
-import { useParams } from "next/navigation";
+import { addProductToCart, isProductInCart, listCartItems } from "@/services/checkout";
+
+import { useParams, useRouter } from "next/navigation";
 
 import {
   Column,
@@ -36,7 +38,9 @@ import {
   ProductActionMethodCard,
   ProductActionPriceCard,
   ProductActionPriceRow,
+  ProductActionPrimaryButton,
   ProductActionRowTitle,
+  ProductActionSecondaryButton,
   ProductContainerHeader,
   Row,
   SellerInfoLocationCard,
@@ -51,10 +55,13 @@ import {
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<Seller | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+
 
   useEffect(() => {
     async function fetchData() {
@@ -71,6 +78,12 @@ export default function ProductPage() {
             console.log("sellerData: " + sellerData);
           } else {
             console.warn("Produto não possui um sellerId:", productData);
+          }
+
+          if(productData.id) {
+            const existProductInCart = await isProductInCart(productData.id);
+            console.log("existProductInCart ", existProductInCart);
+            setIsInCart(existProductInCart);
           }
         }
       } catch (error) {
@@ -107,6 +120,34 @@ export default function ProductPage() {
       );
     }
   };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+  
+    try {
+      await addProductToCart(product.id, 1);
+      console.log(`Produto "${product.title}" adicionado ao carrinho.`);
+    } catch (error) {
+      console.error("Erro ao adicionar produto ao carrinho:", error);
+    }
+  };
+
+  const goToCheckout = async () => {
+    router.push("/checkout");
+  }; 
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+  
+    try {
+      await addProductToCart(product.id, 1);
+      router.push("/checkout");
+      console.log(`Produto "${product.title}" adicionado ao carrinho e enviado a tela.`);
+    } catch (error) {
+      console.error("Erro ao adicionar produto ao carrinho:", error);
+    }
+  };
+  
 
   if (loading) {
     return <div>Carregando detalhes do produto...</div>;
@@ -186,10 +227,22 @@ export default function ProductPage() {
                     </ProductActionMethodCard>
 
                     <ProductActionActions>
-                      <ProductActionButton solid>
-                        Comprar agora
-                      </ProductActionButton>
-                      <ProductActionButton>Adicionar ao carrinho</ProductActionButton>
+                      {isInCart ? (
+                        <>
+                          <ProductActionPrimaryButton onClick={goToCheckout}>
+                            Ir para o Checkout
+                          </ProductActionPrimaryButton>
+                        </>
+                      ) : (
+                        <>
+                          <ProductActionPrimaryButton onClick={handleBuyNow}>
+                            Comprar agora
+                          </ProductActionPrimaryButton>
+                          <ProductActionSecondaryButton onClick={handleAddToCart}>
+                            Adicionar ao carrinho
+                          </ProductActionSecondaryButton>
+                        </>
+                      )}
                     </ProductActionActions>
 
                     <ProductActionBenefits>

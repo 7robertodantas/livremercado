@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { addProductToCart, getCart, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
+import { addProductToCart, getCart, isProductInCart, removeProductFromCart, updateProductInCart } from '../repositories/CartRepository';
 
 const router = Router();
 
@@ -67,5 +67,25 @@ router.delete('/products/:productId', async (req, res) => {
         res.status(409).send({ message: 'Failed to remove product from cart' });
     }
 });
+
+/**
+ * Check if a product exists in the cart
+ */
+router.get("/products/:productId/exists", async (req: Request, res: Response) => {
+    const { productId } = req.params;
+  
+    if (!productId) {
+      res.status(400).send({ message: "Product ID is required" });
+      return;
+    }
+  
+    try {
+      const exists = await isProductInCart(productId);
+      res.status(200).send({ exists });
+    } catch (error) {
+      res.status(500).send({ message: "Failed to check if the product exists in the cart" });
+    }
+  });
+  
 
 export default router;

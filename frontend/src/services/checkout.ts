@@ -32,3 +32,29 @@ export async function deleteCartItem(productId: string): Promise<void> {
     },
   });
 }
+
+export async function addProductToCart(productId: string, quantity: number): Promise<void> {
+  await fetch(`http://localhost:4000/cart/products`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId, quantity }),
+  });
+}
+
+export async function isProductInCart(productId: string): Promise<boolean> {
+  const response = await fetch(`http://localhost:4000/cart/products/${productId}/exists`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to check if the product is in the cart');
+  }
+
+  const { exists } = await response.json();
+  return exists;
+}

@@ -115,3 +115,23 @@ export const removeProductFromCart = async (productId: string) => {
     });
   });
 };
+
+export const isProductInCart = async (productId: string): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      `
+      SELECT 1 
+      FROM cart_item 
+      WHERE product_id = ?
+    `,
+      [productId],
+      (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(!!row);
+        }
+      }
+    );
+  });
+};

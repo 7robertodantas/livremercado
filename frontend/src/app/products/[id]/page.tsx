@@ -8,13 +8,13 @@ import {
   HiOutlineShieldCheck,
   HiOutlineLocationMarker,
 } from "react-icons/hi";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Product } from "@/types/Product";
 import { Seller } from "@/types/Seller";
 import { getProductById, updateProductFavorite } from "@/services/products";
 import { getSellerById } from "@/services/sellers";
-import { useParams } from "next/navigation";
+import { isProductInCart } from "@/services/checkout";
+
+import { useParams, useRouter } from "next/navigation";
 
 import {
   Column,
@@ -30,17 +30,17 @@ import {
   Panel,
   ProductActionActions,
   ProductActionBenefits,
-  ProductActionButton,
   ProductActionCategory,
   ProductActionContainer,
   ProductActionMethodCard,
   ProductActionPriceCard,
   ProductActionPriceRow,
+  ProductActionPrimaryButton,
   ProductActionRowTitle,
+  ProductActionSecondaryButton,
   ProductContainerHeader,
   Row,
   SellerInfoLocationCard,
-  SellerInfoMore,
   SellerInfoReputationCard,
   SellerInfoReputationRow,
   SellerInfoReputationThermometer,
@@ -54,37 +54,43 @@ import MainLayout from "@/layouts/MainLayout";
 export default function ProductPage() {
   const cart = useCartContext();
   const params = useParams();
+  const router = useRouter();
+  
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<Seller | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+
+  const fetchData = async () : Promise<void> => {
+    try {
+      if (params?.id) {
+        const productData = await getProductById({ id: Array.isArray(params.id) ? params.id[0] : params.id });
+        setProduct(productData);
+        setIsFavorited(productData.isFavorite);
+
+        if (productData.sellerId) {
+          const sellerData = await getSellerById({ id: String(productData.sellerId) });
+          setSeller(sellerData);
+        } else {
+          console.warn("Produto não possui um sellerId:", productData);
+        }
+
+        if(productData.id) {
+          const existProductInCart = await isProductInCart(productData.id);        
+          setIsInCart(existProductInCart);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        if (params?.id) {
-          const productData = await getProductById({ id: Array.isArray(params.id) ? params.id[0] : params.id });
-          setProduct(productData);
-          setIsFavorited(productData.isFavorite);
-          console.log(productData);
-
-          if (productData.sellerId) {
-            const sellerData = await getSellerById({ id: String(productData.sellerId) });
-            setSeller(sellerData);
-            console.log("sellerData: " + sellerData);
-          } else {
-            console.warn("Produto não possui um sellerId:", productData);
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchData();
-  }, [params]);
+  }, [params, cart.items]);
 
   const toggleFavorite = async () => {
     if (!product) return;
@@ -111,20 +117,51 @@ export default function ProductPage() {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!product) return;
+    
+    try {
+      await cart.addProduct(product.id);
+      console.log(`Produto "${product.title}" adicionado ao carrinho.`);
+    } catch (error) {
+      console.error("Erro ao adicionar produto ao carrinho:", error);
+    }
+  };
+
+  const handleRemoveFromCart = async () => {
+    if (!product) return;
+
+    try {
+      await cart.removeProduct(product.id);
+      console.log(`Produto "${product.title}" removido do carrinho.`);
+    } catch (error) {
+      console.error("Erro ao remover produto do carrinho:", error);
+    }
+  }
+
+  const goToCheckout = async () => {
+    router.push("/checkout");
+  }; 
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+  
+    try {
+      await cart.addProduct(product.id);
+      router.push("/checkout");
+      console.log(`Produto "${product.title}" adicionado ao carrinho e enviado a tela.`);
+    } catch (error) {
+      console.error("Erro ao adicionar produto ao carrinho:", error);
+    }
+  };
+  
+
   if (loading) {
     return <div>Carregando detalhes do produto...</div>;
   }
 
   if (!product) {
     return <div>Produto não encontrado.</div>;
-  }
-
-  const handleAddProductToCart = async () => {
-    cart.addProduct(product.id);
-  }
-
-  const handleRemoveProductFromCart = async () => {
-    cart.removeProduct(product.id);
   }
 
   return (
@@ -196,16 +233,25 @@ export default function ProductPage() {
                     </ProductActionMethodCard>
 
                     <ProductActionActions>
-                      <ProductActionButton solid>
-                        Comprar agora
-                      </ProductActionButton>
-                      {cart.containsProduct(product.id) ? 
-                      <ProductActionButton onClick={handleRemoveProductFromCart}>
-                        Remover do carrinho</ProductActionButton> : 
-                        <ProductActionButton onClick={handleAddProductToCart}>
-                        Adicionar ao carrinho</ProductActionButton>
-                    }
-                      
+                      {isInCart ? (
+                        <>
+                          <ProductActionPrimaryButton onClick={goToCheckout}>
+                            Ir para o Carrinho
+                          </ProductActionPrimaryButton>
+                          <ProductActionSecondaryButton onClick={handleRemoveFromCart}>
+                            Remover do carrinho
+                          </ProductActionSecondaryButton>
+                        </>
+                      ) : (
+                        <>
+                          <ProductActionPrimaryButton onClick={handleBuyNow}>
+                            Comprar agora
+                          </ProductActionPrimaryButton>
+                          <ProductActionSecondaryButton onClick={handleAddToCart}>
+                            Adicionar ao carrinho
+                          </ProductActionSecondaryButton>
+                        </>
+                      )}
                     </ProductActionActions>
 
                     <ProductActionBenefits>

@@ -226,6 +226,49 @@ export const ProductActionButton = styled.button.attrs<React.ButtonHTMLAttribute
     border: ${({ solid }) => (solid ? 'none' : '1px solid #3483fa')};
 `;
 
+export const ProductActionPrimaryButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  border-radius: 4px;
+  padding: 12px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+
+  background-color: #3483fa;
+  color: #fff;
+  border: none;
+
+  &:hover {
+    background: #2968c8;
+  }
+`;
+
+export const ProductActionSecondaryButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  border-radius: 4px;
+  padding: 12px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+
+  background: transparent;
+  color: #3483fa;
+  border: 1px solid #3483fa;
+
+  &:hover {
+    background: #e3f2fd;
+    color: #2968c8;
+  }
+`;
+
+
+
 export const ProductActionBenefits = styled.ul`
     margin-top: 16px;
     list-style: none;

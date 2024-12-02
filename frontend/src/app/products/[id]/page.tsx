@@ -49,7 +49,6 @@ import {
   Wrapper,
 } from "./styles";
 import { useCartContext } from "@/context/CartContext";
-import MainLayout from "@/layouts/MainLayout";
 
 interface ProductState {
   product: Product | null;

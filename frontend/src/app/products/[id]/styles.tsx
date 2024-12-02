@@ -4,17 +4,11 @@ import styled from 'styled-components';
 
 export const ContainerProductDetails = styled.div`
     width: 100%;
-    height: 100vh;
+    height: 100%;
     background: #F5F5F5;
-
     flex-direction: column;
-
-
-justify-content: space-between;
-
-display: flex;
-    
-
+    justify-content: space-between;
+    display: flex;
     color: #333333;
 `;
 
@@ -25,10 +19,7 @@ export const ContainerWrapper = styled.div`
     border-radius: 80px;
     display: flex;
     flex-direction: column;
-
-
     justify-content: space-between;
-
     display: flex;
     flex: 1;
 `;

@@ -72,7 +72,7 @@ export default function ProductPage() {
 
   const loadSeller = async () => {
     if (!state.product || !state.product.sellerId) return;
-    const seller: Seller = await getSellerById({ id: state.product.sellerId });
+    const seller = await getSellerById({ id: state.product.sellerId });
     setState((prevState) => ({ ...prevState, seller }));
   }
 
@@ -85,7 +85,6 @@ export default function ProductPage() {
     try {
       setState((prevState) => ({ ...prevState, loading: true }));
       await loadProduct();
-      await Promise.all([loadSeller(), loadIsInCart()]);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     } finally {
@@ -97,6 +96,10 @@ export default function ProductPage() {
     fetchData();
   }, [params, cart.items]);
 
+  useEffect(() => {
+    loadIsInCart();
+    loadSeller();
+  }, [state.product]);
 
   const toggleFavorite = async () => {
     if (!state.product) return;
